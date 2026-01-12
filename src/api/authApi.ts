@@ -1,5 +1,6 @@
 import { LoginSchema, AuthResponse } from '@/lib/schemas/auth/login';
-import { ClientRegisterInput, ClientAdminRegisterInput, AuthRegisterResponse } from '@/lib/schemas/auth/register';
+import { ClientRegisterInput, ClientAdminRegisterInput, AuthRegisterResponse,  AgentRegisterInput } from '@/lib/schemas/auth/register';
+ 
 import axios from "axios";
 import { apiClient } from "@/context/axios";
 
@@ -171,175 +172,119 @@ export const DeleteApi = async (userId: string) => {
 
 
 
+// ============================================
+// AGENT REGISTRATION & ACTIONS
+// ============================================
+export const registerAgentApi = async (data: AgentRegisterInput): Promise<AuthRegisterResponse> => {
+  try {
+    const response = await apiClient.post('/api/agents/register-new', data);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.response?.data ||
+        'Agent registration failed'
+      );
+    }
+    throw new Error('An unexpected error occurred');
+  }
+};
+
+export const getAgentStatsApi = async () => {
+  try {
+    const response = await apiClient.get('/api/agents/my-stats');
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message || 'Failed to get agent stats');
+    }
+    throw new Error('An unexpected error occurred');
+  }
+};
+
+export const recordAgentSaleApi = async (data: { orderId: number; agentCode: string }) => {
+  try {
+    const response = await apiClient.post('/api/agents/record-sale', data);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message || 'Failed to record sale');
+    }
+    throw new Error('An unexpected error occurred');
+  }
+};
+
+// ============================================
+// ADMIN AGENT ROUTES
+// ============================================
+export const getAllAgentsApi = async () => {
+  try {
+    const response = await apiClient.get('/api/agents/all');
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message || 'Failed to get agents');
+    }
+    throw new Error('An unexpected error occurred');
+  }
+};
+
+export const approveCommissionApi = async (saleId: number) => {
+  try {
+    const response = await apiClient.post(`/api/agents/sales/${saleId}/approve`);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message || 'Failed to approve commission');
+    }
+    throw new Error('An unexpected error occurred');
+  }
+};
+
+export const createPayoutApi = async (data: {
+  agentId: number;
+  amount: number;
+  paymentMethod: string;
+  paymentReference?: string;
+  payoutAccount?: string;
+  fromDate: string;
+  toDate: string;
+}) => {
+  try {
+    const response = await apiClient.post('/api/agents/payouts/create', data);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message || 'Failed to create payout');
+    }
+    throw new Error('An unexpected error occurred');
+  }
+};
+
+export const completePayoutApi = async (payoutId: number) => {
+  try {
+    const response = await apiClient.post(`/api/agents/payouts/${payoutId}/complete`);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message || 'Failed to complete payout');
+    }
+    throw new Error('An unexpected error occurred');
+  }
+};
+
+export const getPendingPayoutsApi = async () => {
+  try {
+    const response = await apiClient.get('/api/agents/payouts/pending');
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message || 'Failed to get pending payouts');
+    }
+    throw new Error('An unexpected error occurred');
+  }
+};
 
 
-
-
-
-
-
-
-
-
-// import { AuthResponse, LoginSchema } from './../lib/schemas/auth/login';
-// import {RegisterInput, AuthRegisterResponse  } from "./../lib/schemas/auth/register";
-// import axios from "axios";
-// import { apiClient } from "@/context/axios";
-
-
-// export const loginApi = async (data: LoginSchema) : Promise<AuthResponse>=> {
-//   try {
-//     const response = await apiClient.post('/api/auth/login', data);
-//     return response.data;
-//   } catch (error) {
-//     if (axios.isAxiosError(error)) {
-//       const backendError = error.response?.data;
-
-//       const errorMessage =
-//         backendError?.message ||
-//         (typeof backendError === 'string' ? backendError : null) ||
-//         'Login failed';
-
-//       throw new Error(errorMessage);
-//     }
-
-//     throw new Error('An unexpected error occurred');
-//   }
-// };
-
-
-
-
-
-// export const RegisterApi = async (data: RegisterInput): Promise<AuthRegisterResponse> => {
-//   try {
-//     const response = await apiClient.post('/api/auth/register', data);
-//     return response.data;
-//   } catch (error) {
-//     if (axios.isAxiosError(error)) {
-//       // Extract the backend error message
-//       const backendErrorMessage = error.response?.data?.message || 
-//                                  error.response?.data?.error ||
-//                                  error.response?.data ||
-//                                  'Registration failed';
-      
-//       // Throw with the proper backend message
-//       throw new Error(backendErrorMessage);
-//     }
-//     throw new Error('An unexpected error occurred');
-//   }
-// };
-
-
-// export const ChangePasswordApi = async (data: {currentPassword: string; newPassword: string; confirmNewPassword: string;
-// }) => {
-//   try {
-//     const response = await apiClient.post('/api/auth/change-password', data);
-//     return response.data;
-//   } catch (error) {
-//     if (axios.isAxiosError(error)) {
-//       const backendError = error.response?.data;
-
-//       const errorMessage =
-//         backendError?.message ||
-//         (typeof backendError === 'string' ? backendError : null) ||
-//         'Password change failed';
-
-//       throw new Error(errorMessage);
-//     }
-//     throw new Error('An unexpected error occurred');
-//   }
-// };
-
-
-// export const ResetPasswordApi = async (data: {token: string; newPassword: string; confirmNewPassword: string;
-// }) => {
-//   try {
-//     const response = await apiClient.post('/api/auth/reset-password', data);
-//     return response.data;
-//   } catch (error) {
-//     if (axios.isAxiosError(error)) {
-//       const backendError = error.response?.data;
-
-//       const errorMessage =
-//         backendError?.message ||
-//         (typeof backendError === 'string' ? backendError : null) ||
-//         'Password reset failed';
-
-//       throw new Error(errorMessage);
-//     }
-//     throw new Error('An unexpected error occurred');
-//   }
-// };
-
-
-// export const ForgetPasswordApi = async (data: {email: string}) => {
-//   try {
-//     const response = await apiClient.post('/api/auth/forgot-password', data);
-//     return response.data;
-//   } catch (error) {
-//     if (axios.isAxiosError(error)) {
-//       const backendError = error.response?.data;
-
-//       const errorMessage =
-//         backendError?.message ||
-//         (typeof backendError === 'string' ? backendError : null) ||
-//         'Password reset failed';
-
-//       throw new Error(errorMessage);
-//     }
-//     throw new Error('An unexpected error occurred');
-//   }
-// };
-
-
-// export const DeleteApi = async (userId: string) => {
-//   try {
-//     const response = await apiClient.delete(`/api/auth/users/${userId}`);
-//     return response.data;
-//   } catch (error) {
-//     if (axios.isAxiosError(error)) {
-//       const backendError = error.response?.data;
-
-//       const errorMessage =
-//         backendError?.message ||
-//         (typeof backendError === 'string' ? backendError : null) ||
-//         'Deletion failed';
-
-//       throw new Error(errorMessage);
-//     }
-
-//     throw new Error('An unexpected error occurred');
-//   }
-// }
-
-
-// // Get user API (GET)
-// // export const getAllUsersApi = async () => {
-// //   try {
-// //     const response = await apiClient.get("/api/auth/users");
-// //     return response.data; // This should return an array of users
-// //   } catch (error) {
-// //     if (axios.isAxiosError(error)) {
-// //       throw new Error(error.response?.data.error || `${unexpectedErrorMessage}`);
-// //     } else {
-// //       throw new Error(`${unexpectedErrorMessage}`);
-// //     }
-// //   }
-// // };
-
-
-
-
-// // export const deleteUserApi = async (userId: string) => {
-// //   try {
-// //     const response = await apiClient.delete(`/users/${userId}`);
-// //     return response.data;
-// //   } catch (error) {
-// //     if (axios.isAxiosError(error)) {
-// //       throw new Error(error.response?.data.error || `${unexpectedErrorMessage}`);
-// //     } else {
-// //       throw new Error(`${unexpectedErrorMessage}`);
-// //     }
-// //   }
-// // };

@@ -105,6 +105,10 @@ export interface ProductView {
     reviews: Review[];
     cart: CartItem[];
     // order_items: OrderItem[];
+
+     approval_status?: 'pending' | 'approved' | 'rejected';
+  is_visible?: boolean;
+  can_apply_as_agent?: boolean; // Helper flag
   }
   
 

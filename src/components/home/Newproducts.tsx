@@ -3,9 +3,13 @@ import { useEffect } from "react"
 import { useState } from "react"
 import { useCart } from "../shop/CartContext"
 import { useNavigate } from "react-router-dom"
-import { Star, Plus, ShoppingCart, Heart, X, Check, ChevronRight, Minus } from "lucide-react"
+// import { Star, Plus, ShoppingCart, Heart, X, Check, ChevronRight, Minus } from "lucide-react"
+import { Star, Plus, ShoppingCart, Heart, X, Check, ChevronRight, Minus, User, Briefcase } from "lucide-react"
 import { apiClient } from "@/context/axios"
 import { useAuthStore } from "@/context/userContext"
+import AgentApplicationDialog from '../shop/AgentApplicationDialog';
+import MyAgentApplications from "../shop/MyAgentApplications";
+// import { User, } from "lucide-react"
 
 interface Product {
   id: number
@@ -43,6 +47,8 @@ const NewProducts = () => {
   const { addToCart, error: cartError, clearError } = useCart()
   const navigate = useNavigate()
   const { user } = useAuthStore()
+  const [isAgentDialogOpen, setIsAgentDialogOpen] = useState(false);
+ const [isMyApplicationsDialogOpen, setIsMyApplicationsDialogOpen] = useState(false);
 
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
@@ -232,6 +238,7 @@ const NewProducts = () => {
 
   const goToCart = () => navigate("/cart")
   const goToShop = () => navigate("/shop")
+  const goToMyAgentApplications = () => navigate("/my-agent-applications")
 
   const renderStars = (rating = 4.5, productId?: number) => {
     const stars = []
@@ -321,6 +328,10 @@ const NewProducts = () => {
   const getProductReviews = (product: Product): Review[] => {
     return product.reviews || []
   }
+
+
+
+
 
   if (loading) return <div className="text-center py-10">Loading products...</div>
   if (error) return <div className="text-red-500 text-center py-10">{error.message}</div>
@@ -558,6 +569,80 @@ const NewProducts = () => {
                     <button className="flex-1 bg-gray-800 text-white py-3 px-6 rounded-lg font-montserratBold hover:bg-gray-700 transition-colors">
                       Buy Now
                     </button>
+
+
+
+                        {/* Become an Agent Section */}
+{/* <div className="border-t pt-6 mt-6">
+  <button
+    onClick={() => {
+      setIsAgentDialogOpen(true);
+    }}
+    className="w-full py-3 px-6 bg-purple-500 text-white rounded-lg font-semibold hover:bg-purple-600 transition-colors flex items-center justify-center gap-2"
+  >
+    <User size={20} />
+    Become an Agent for This Product
+  </button>
+  <p className="text-xs text-gray-500 text-center mt-2">
+    Earn commission by promoting this product
+  </p>
+</div> */}
+
+
+
+<div className="border-t pt-6 mt-6">
+  <button
+    onClick={() => {
+      setIsAgentDialogOpen(true);
+    }}
+    className="w-full py-3 px-6 bg-purple-500 text-white rounded-lg font-semibold hover:bg-purple-600 transition-colors flex items-center justify-center gap-2"
+  >
+    <User size={20} />
+    Become an Agent for This Product
+  </button>
+
+  {/* View Applications Button */}
+  <button
+    onClick={() => {
+      setIsMyApplicationsDialogOpen(true);
+    }}
+    className="w-full mt-3 py-3 px-6 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
+  >
+    <Briefcase size={20} />
+    View My Agent Applications
+  </button>
+  
+  <p className="text-xs text-gray-500 text-center mt-2">
+    Earn commission by promoting this product
+  </p>
+</div>
+
+
+{/* My Applications Dialog */}
+{isMyApplicationsDialogOpen && (
+  <div
+    className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[70] p-4"
+    onClick={() => setIsMyApplicationsDialogOpen(false)}
+  >
+    <div
+      className="bg-white rounded-lg w-full max-w-6xl max-h-[90vh] overflow-y-auto"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="sticky top-0 bg-white border-b p-4 flex items-center justify-between">
+        <h2 className="text-xl font-bold">My Agent Applications</h2>
+        <button
+          onClick={() => setIsMyApplicationsDialogOpen(false)}
+          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+        >
+          <X size={20} />
+        </button>
+      </div>
+      <MyAgentApplications />
+    </div>
+  </div>
+)} 
+
+
                   </div>
 
                   <div className="space-y-4 border-t pt-4">
@@ -616,6 +701,11 @@ const NewProducts = () => {
 
       {/* Review Dialog */}
       {isReviewDialogOpen && (
+
+
+
+
+
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4"
           onClick={closeReviewDialog}
@@ -681,6 +771,20 @@ const NewProducts = () => {
         </div>
       </div>
     )}
+
+
+    {/* Agent Application Dialog */}
+<AgentApplicationDialog
+  isOpen={isAgentDialogOpen}
+  onClose={() => setIsAgentDialogOpen(false)}
+  productId={selectedProduct?.id || 0}
+  productName={selectedProduct?.name || ''}
+  onSuccess={() => {
+    showToast('Agent application submitted successfully!', 'success');
+    // Optionally refresh data here
+  }}
+/>
+
 
     {/* Toast Notifications */}
     <div className="fixed top-4 right-4 z-[1000] space-y-4 pointer-events-none">

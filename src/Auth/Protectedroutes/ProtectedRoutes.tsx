@@ -74,13 +74,69 @@
 
 
 
+// // src/Auth/Protectedroutes/ProtectedRoutes.tsx
+// import { Navigate, Outlet } from 'react-router-dom';
+// import { useAuthStore } from '@/context/userContext';
+// import MainSidebar from '../../Mainsidebar/Sidebar';
+
+// interface RoleProtectedRouteProps {
+//   requiredRole: 'user' | 'admin';
+//   redirectTo: string;
+// }
+
+// export const RoleProtectedRoute = ({ requiredRole, redirectTo }: RoleProtectedRouteProps) => {
+//   const { user } = useAuthStore();
+
+//   if (!user) {
+//     return <Navigate to="/login" replace />;
+//   }
+
+//   // ✅ Map backend roles to frontend role system
+//   const isAdmin = 
+//     user.role === 'super_admin' || 
+//     user.role === 'digital_marketer_admin' || 
+//     user.role === 'client_admin';
+  
+//   const isUser = user.role === 'client';
+
+//   // ✅ Check if user has required role using the mapped values
+//   const hasRequiredRole = 
+//     (requiredRole === 'admin' && isAdmin) || 
+//     (requiredRole === 'user' && isUser);
+
+//   if (!hasRequiredRole) {
+//     return <Navigate to={redirectTo} replace />;
+//   }
+
+//   // For admin routes, wrap with MainSidebar (dashboard layout)
+//   if (requiredRole === 'admin') {
+//     return (
+//       <MainSidebar>
+//         <Outlet />
+//       </MainSidebar>
+//     );
+//   }
+
+//   // For user routes, just render the outlet (e-commerce layout is handled in individual components)
+//   return <Outlet />;
+// };
+
+
+
+
+
+
+
+
+
+
 // src/Auth/Protectedroutes/ProtectedRoutes.tsx
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuthStore } from '@/context/userContext';
 import MainSidebar from '../../Mainsidebar/Sidebar';
 
 interface RoleProtectedRouteProps {
-  requiredRole: 'user' | 'admin';
+  requiredRole: 'user' | 'admin' | 'agent';
   redirectTo: string;
 }
 
@@ -91,25 +147,28 @@ export const RoleProtectedRoute = ({ requiredRole, redirectTo }: RoleProtectedRo
     return <Navigate to="/login" replace />;
   }
 
-  // ✅ Map backend roles to frontend role system
+  // Map backend roles to frontend role system
   const isAdmin = 
     user.role === 'super_admin' || 
     user.role === 'digital_marketer_admin' || 
     user.role === 'client_admin';
   
   const isUser = user.role === 'client';
+  
+  const isAgent = user.role === 'agent';
 
-  // ✅ Check if user has required role using the mapped values
+  // Check if user has required role using the mapped values
   const hasRequiredRole = 
     (requiredRole === 'admin' && isAdmin) || 
-    (requiredRole === 'user' && isUser);
+    (requiredRole === 'user' && isUser) ||
+    (requiredRole === 'agent' && isAgent);
 
   if (!hasRequiredRole) {
     return <Navigate to={redirectTo} replace />;
   }
 
-  // For admin routes, wrap with MainSidebar (dashboard layout)
-  if (requiredRole === 'admin') {
+  // For admin and agent routes, wrap with MainSidebar (dashboard layout)
+  if (requiredRole === 'admin' || requiredRole === 'agent') {
     return (
       <MainSidebar>
         <Outlet />
@@ -117,6 +176,6 @@ export const RoleProtectedRoute = ({ requiredRole, redirectTo }: RoleProtectedRo
     );
   }
 
-  // For user routes, just render the outlet (e-commerce layout is handled in individual components)
+  // For user routes, just render the outlet
   return <Outlet />;
 };
