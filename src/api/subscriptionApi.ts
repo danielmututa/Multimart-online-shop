@@ -35,7 +35,7 @@ export const submitActivationPayment = async (
   }
   
   try {
-    const response = await apiClient.post('/api/subscriptions/activation/submit', formData, {
+    const response = await apiClient.post('/api/v1/activation/submit', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -70,7 +70,7 @@ export const submitSubscriptionPayment = async (
   }
   
   try {
-    const response = await apiClient.post('/api/subscriptions/subscription/submit', formData, {
+    const response = await apiClient.post('/api/v1/subscription/submit', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -92,7 +92,7 @@ export const submitSubscriptionPayment = async (
 // Get merchant's subscription status
 export const getMySubscription = async (): Promise<MerchantSubscription> => {
   try {
-    const response = await apiClient.get('/api/subscriptions/subscription/me');
+    const response = await apiClient.get('/api/v1/subscription/me');
     return response.data.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -114,7 +114,7 @@ export const getMySubscription = async (): Promise<MerchantSubscription> => {
 // Get all pending payments (admin only)
 export const getPendingPayments = async (): Promise<PaymentProof[]> => {
   try {
-    const response = await apiClient.get('/api/subscriptions/payments/pending');
+    const response = await apiClient.get('/api/v1/payments/pending');
     return response.data.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -134,7 +134,7 @@ export const processPayment = async (
   data: ProcessPaymentRequest
 ): Promise<{ success: boolean; message: string }> => {
   try {
-    const response = await apiClient.post('/api/subscriptions/payments/process', data);
+    const response = await apiClient.post('/api/v1/payments/process', data);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -156,7 +156,7 @@ export const processPayment = async (
 // Get all pending approvals (admin only)
 export const getPendingApprovals = async (): Promise<ApprovalItem[]> => {
   try {
-    const response = await apiClient.get('/api/admin/approvals/pending');
+    const response = await apiClient.get('/api/v1/approvals/pending');
     return response.data.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -174,7 +174,7 @@ export const getPendingApprovals = async (): Promise<ApprovalItem[]> => {
 // Get all approvals (admin only)
 export const getAllApprovals = async (): Promise<ApprovalItem[]> => {
   try {
-    const response = await apiClient.get('/api/admin/approvals/all');
+    const response = await apiClient.get('/api/v1/approvals/all');
     return response.data.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -194,7 +194,7 @@ export const processApproval = async (
   data: ProcessApprovalRequest
 ): Promise<{ success: boolean; message: string }> => {
   try {
-    const response = await apiClient.post('/api/admin/approvals/process', data);
+    const response = await apiClient.post('/api/v1/approvals/process', data);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -218,7 +218,7 @@ export const getApprovalStats = async (): Promise<{
   byType: { blog: number; product: number };
 }> => {
   try {
-    const response = await apiClient.get('/api/admin/approvals/stats');
+    const response = await apiClient.get('/api/v1/approvals/stats');
     return response.data.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

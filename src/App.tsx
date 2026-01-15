@@ -109,10 +109,31 @@ function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/feedback" element={<FeedbackPage />} />
               <Route path="/orders" element={<OrdersPage />} />
-              <Route path="/products" element={<ProductsPage />} />
+              {/* <Route path="/products" element={<ProductsPage />} /> */}
+
+
+ <Route 
+    path="/products" 
+    element={
+      <ProductGuard>
+        <ProductsPage />
+      </ProductGuard>
+    } 
+  />
+  
+  <Route 
+    path="/blogs" 
+    element={
+      <BlogGuard>
+        <BlogPage />
+      </BlogGuard>
+    } 
+  />
+
+
                <Route path="/blogandproductsapproval" element={<BlogAndProductsApprovalPage />} />
               <Route path="/agentproducts" element={<AgentProductsPage />} />
-              <Route path="/blogs" element={<BlogPage />} />
+              {/* <Route path="/blogs" element={<BlogPage />} /> */}
               <Route path="/prodt" element={<ProductShowcases />} />
               <Route path="/blogshowcase" element={<BlogShowcases />} />
               <Route path="/users" element={<UsersPage />} />
