@@ -47,9 +47,9 @@ const RoleSelection = () => {
               </p>
             </Card>
 
-            {/* <Card 
+            <Card 
               className={`cursor-pointer p-4 text-center border-2 transition-all ${
-                selectedRole === "admin" 
+                selectedRole === "client_admin" 
                   ? "border-blue-500 bg-blue-50" 
                   : "border-gray-200 hover:border-blue-300"
               }`}
@@ -59,9 +59,9 @@ const RoleSelection = () => {
               <p className="text-sm text-gray-600">
                 Full system access, manage everything
               </p>
-            </Card> */}
+            </Card>
 
-            <Card 
+            {/* <Card 
               className={`cursor-pointer p-4 w-full text-center border-2 transition-all ${
                 selectedRole === "client_admin" 
                   ? "border-blue-500 bg-blue-50" 
@@ -73,7 +73,7 @@ const RoleSelection = () => {
               <p className="text-sm text-gray-600">
                 Manage your business products, blogs, and sales
               </p>
-            </Card>
+            </Card> */}
 
             {/* <Card 
               className={`cursor-pointer p-4 text-center border-2 transition-all ${
