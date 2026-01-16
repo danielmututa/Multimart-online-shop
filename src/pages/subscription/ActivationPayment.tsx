@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DollarSign, Upload, CheckCircle, AlertCircle } from 'lucide-react';
 import { submitActivationPayment } from '@/api/subscriptionApi';
-import { SUBSCRIPTION_PLANS } from '@/components/interfaces/subscription';
+// import { SUBSCRIPTION_PLANS } from '@/components/interfaces/subscription';
 
 const ActivationPayment = () => {
   const navigate = useNavigate();

@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent} from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { getPendingDocuments, approveDocument, rejectDocument } from "@/services/businessDocuments";
+import { getPendingDocuments, approveDocument, rejectDocument } from "@/api/businessDocumentsApi";
 import { toast } from "sonner";
 import { FileText, CheckCircle, XCircle, Building2 } from "lucide-react";
-import type { BusinessDocument } from "@/lib/schemas/documents/businessDocuments";
+// import type { BusinessDocument } from "@/lib/schemas/documents/businessDocuments";
 
 const PendingDocumentsPage = () => {
   const [documents, setDocuments] = useState<any[]>([]);

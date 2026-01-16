@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, Calendar, Shield, Zap, Clock, AlertCircle } from 'lucide-react';
 import { submitSubscriptionPayment, getMySubscription } from '@/api/subscriptionApi';
-import { SUBSCRIPTION_PLANS } from '@/components/interfaces/subscription';
+// import { SUBSCRIPTION_PLANS } from '@/components/interfaces/subscription';
 
 const SubscriptionPlans = () => {
   const navigate = useNavigate();

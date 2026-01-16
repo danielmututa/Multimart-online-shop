@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { apiClient } from "@/context/axios";
 import { toast } from "sonner";
-import { DollarSign, ShoppingCart, TrendingUp, Users } from "lucide-react";
+import { DollarSign, ShoppingCart, TrendingUp } from "lucide-react";
 
 const AgentDashboard = () => {
   const [stats, setStats] = useState<any>(null);

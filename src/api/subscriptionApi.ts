@@ -6,12 +6,12 @@ import {
   ActivationPaymentData,
   SubscriptionPaymentData,
   MerchantSubscription,
-  PendingPaymentsResponse,
+  // PendingPaymentsResponse,
   PaymentResponse,
-  SubscriptionResponse,
+  // SubscriptionResponse,
   ProcessPaymentRequest,
   ApprovalItem,
-  ApprovalResponse,
+  // ApprovalResponse,
   ProcessApprovalRequest
 } from "@/components/interfaces/subscription";
 

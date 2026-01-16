@@ -1,5 +1,5 @@
 // AdminAgentManagement.tsx - FIXED VERSION
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { 
   Search, 
   CheckCircle, 
@@ -11,8 +11,7 @@ import {
   Clock,
   Filter,
   Eye,
-  RefreshCw,
-  AlertCircle
+  RefreshCw
 } from 'lucide-react';
 import {
   GetPendingAgentApplications,

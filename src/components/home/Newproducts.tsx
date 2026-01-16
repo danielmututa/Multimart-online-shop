@@ -238,7 +238,7 @@ const NewProducts = () => {
 
   const goToCart = () => navigate("/cart")
   const goToShop = () => navigate("/shop")
-  const goToMyAgentApplications = () => navigate("/my-agent-applications")
+  // const goToMyAgentApplications = () => navigate("/my-agent-applications")
 
   const renderStars = (rating = 4.5, productId?: number) => {
     const stars = []

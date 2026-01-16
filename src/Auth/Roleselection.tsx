@@ -32,7 +32,7 @@ const RoleSelection = () => {
           <CardDescription>Choose how you want to use our platform</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2  gap-4">
             <Card 
               className={`cursor-pointer p-4 text-center border-2 transition-all ${
                 selectedRole === "user" 
@@ -47,7 +47,7 @@ const RoleSelection = () => {
               </p>
             </Card>
 
-            <Card 
+            {/* <Card 
               className={`cursor-pointer p-4 text-center border-2 transition-all ${
                 selectedRole === "admin" 
                   ? "border-blue-500 bg-blue-50" 
@@ -59,10 +59,10 @@ const RoleSelection = () => {
               <p className="text-sm text-gray-600">
                 Full system access, manage everything
               </p>
-            </Card>
+            </Card> */}
 
             <Card 
-              className={`cursor-pointer p-4 text-center border-2 transition-all ${
+              className={`cursor-pointer p-4 w-full text-center border-2 transition-all ${
                 selectedRole === "client_admin" 
                   ? "border-blue-500 bg-blue-50" 
                   : "border-gray-200 hover:border-blue-300"
@@ -75,7 +75,7 @@ const RoleSelection = () => {
               </p>
             </Card>
 
-            <Card 
+            {/* <Card 
               className={`cursor-pointer p-4 text-center border-2 transition-all ${
                 selectedRole === "agent" 
                   ? "border-blue-500 bg-blue-50" 
@@ -87,7 +87,7 @@ const RoleSelection = () => {
               <p className="text-sm text-gray-600">
                 Handle agent-specific tasks and client interactions
               </p>
-            </Card>
+            </Card> */}
           </div>
 
           <Button 

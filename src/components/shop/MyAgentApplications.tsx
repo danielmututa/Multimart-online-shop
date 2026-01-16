@@ -1,5 +1,5 @@
 // MyAgentApplications.tsx - Updated with URL transformation
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { 
   Copy, 
   CheckCircle, 
@@ -22,22 +22,8 @@ const MyAgentApplications = () => {
   const [referralLinks, setReferralLinks] = useState<Record<number, string>>({});
   const [copiedId, setCopiedId] = useState<number | null>(null);
 
-  // Function to transform the URL from Vercel to your custom domain
-  const transformReferralUrl = (vercelUrl: string): string => {
-    try {
-      // Replace the Vercel URL with your custom domain
-      const url = new URL(vercelUrl);
-      
-      // Replace the hostname with your custom domain
-      // Keep the same path and query parameters
-      const newUrl = `https://mmshop.co.zw${url.pathname}${url.search}`;
-      
-      return newUrl;
-    } catch (error) {
-      console.error('Error transforming URL:', error);
-      return vercelUrl; // Return original if transformation fails
-    }
-  };
+
+  
 
   // Alternative simpler function if above doesn't work
   const transformReferralUrlSimple = (vercelUrl: string): string => {
@@ -52,48 +38,93 @@ const MyAgentApplications = () => {
     loadApplications();
   }, []);
 
-  const loadApplications = async () => {
-    setLoading(true);
-    try {
-      const data = await GetMyAgentApplications();
-      console.log('Applications loaded:', data);
-      setApplications(Array.isArray(data) ? data : []);
+  // const loadApplications = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const data = await GetMyAgentApplications();
+  //     console.log('Applications loaded:', data);
+  //     setApplications(Array.isArray(data) ? data : []);
       
-      // Generate referral links for approved agents
-      if (Array.isArray(data)) {
-        for (const app of data) {
-          if (app.status === 'approved' && app.product_id) {
-            try {
-              console.log('Generating link for product:', app.product_id);
-              const linkData = await GenerateReferralLink(app.product_id);
-              console.log('Link generated:', linkData);
+  //     // Generate referral links for approved agents
+  //     if (Array.isArray(data)) {
+  //       for (const app of data) {
+  //         if (app.status === 'approved' && app.product_id) {
+  //           try {
+  //             console.log('Generating link for product:', app.product_id);
+  //             const linkData = await GenerateReferralLink(app.product_id);
+  //             console.log('Link generated:', linkData);
               
-              // Get the original referral link
-              const originalLink = linkData.referralLink || linkData.data?.referralLink || '';
+  //             // Get the original referral link
+  //             // const originalLink = linkData.referralLink || linkData.data?.referralLink || '';
+  //             const originalLink = linkData.link || linkData.url || linkData.referral_link || '';
+  //             // Transform the URL to use your custom domain
+  //             const transformedLink = transformReferralUrlSimple(originalLink);
               
-              // Transform the URL to use your custom domain
-              const transformedLink = transformReferralUrlSimple(originalLink);
+  //             console.log('Original link:', originalLink);
+  //             console.log('Transformed link:', transformedLink);
               
-              console.log('Original link:', originalLink);
-              console.log('Transformed link:', transformedLink);
-              
-              setReferralLinks(prev => ({
-                ...prev,
-                [app.id]: transformedLink
-              }));
-            } catch (error) {
-              console.error('Failed to generate referral link for product', app.product_id, error);
-            }
+  //             setReferralLinks(prev => ({
+  //               ...prev,
+  //               [app.id]: transformedLink
+  //             }));
+  //           } catch (error) {
+  //             console.error('Failed to generate referral link for product', app.product_id, error);
+  //           }
+  //         }
+  //       }
+  //     }
+  //   } catch (error: any) {
+  //     console.error('Failed to load applications:', error);
+  //     alert(`Error loading applications: ${error.message}`);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+
+const loadApplications = async () => {
+  setLoading(true);
+  try {
+    const data = await GetMyAgentApplications();
+    console.log('Applications loaded:', data);
+    setApplications(Array.isArray(data) ? data : []);
+    
+    // Generate referral links for approved agents
+    if (Array.isArray(data)) {
+      for (const app of data) {
+        if (app.status === 'approved' && app.product_id) {
+          try {
+            console.log('Generating link for product:', app.product_id);
+            const linkData = await GenerateReferralLink(app.product_id);
+            console.log('Link generated:', linkData);
+            
+            // Get the original referral link - FIXED LINE
+            const originalLink = linkData.data?.referralLink || '';
+            
+            // Transform the URL to use your custom domain
+            const transformedLink = transformReferralUrlSimple(originalLink);
+            
+            console.log('Original link:', originalLink);
+            console.log('Transformed link:', transformedLink);
+            
+            setReferralLinks(prev => ({
+              ...prev,
+              [app.id]: transformedLink
+            }));
+          } catch (error) {
+            console.error('Failed to generate referral link for product', app.product_id, error);
           }
         }
       }
-    } catch (error: any) {
-      console.error('Failed to load applications:', error);
-      alert(`Error loading applications: ${error.message}`);
-    } finally {
-      setLoading(false);
     }
-  };
+  } catch (error: any) {
+    console.error('Failed to load applications:', error);
+    alert(`Error loading applications: ${error.message}`);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const copyToClipboard = (text: string, id: number) => {
     navigator.clipboard.writeText(text);
