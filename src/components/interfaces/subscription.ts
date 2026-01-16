@@ -237,7 +237,8 @@ export interface ProcessPaymentRequest {
 }
 
 export interface ProcessApprovalRequest {
-  id: number;
+ approvalId: number;
+  // id: number;
   type: 'blog' | 'product';
   action: 'approve' | 'reject';
   rejectionReason?: string;

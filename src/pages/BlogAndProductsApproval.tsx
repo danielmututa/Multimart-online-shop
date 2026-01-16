@@ -114,52 +114,104 @@ const BlogAndProductsApproval = () => {
   }, [items, searchTerm, typeFilter, statusFilter]);
 
   // Handle approval
- const handleApprove = async (id: number, type: 'blog' | 'product') => {
+//  const handleApprove = async (id: number, type: 'blog' | 'product') => {
+//   try {
+//     setProcessingId(id);
+//     await processApproval({
+//       id: id,
+//       type: type,
+//       action: 'approve'
+//     });
+
+
+      
+//       toast.success('Item approved successfully!');
+      
+//       // Reload data
+//       await loadApprovals();
+//       await loadStats();
+//     } catch (error: any) {
+//       console.error('Failed to approve:', error);
+//       toast.error(error.message || 'Failed to approve item');
+//     } finally {
+//       setProcessingId(null);
+//     }
+//   };
+
+
+const handleApprove = async (id: number, type: 'blog' | 'product') => {
   try {
     setProcessingId(id);
     await processApproval({
-      id: id,
+      approvalId: id,  // Changed from 'id' to 'approvalId'
       type: type,
       action: 'approve'
     });
+    
+    toast.success('Item approved successfully!');
+    
+    // Reload data
+    await loadApprovals();
+    await loadStats();
+  } catch (error: any) {
+    console.error('Failed to approve:', error);
+    toast.error(error.message || 'Failed to approve item');
+  } finally {
+    setProcessingId(null);
+  }
+};
 
 
-      
-      toast.success('Item approved successfully!');
-      
-      // Reload data
-      await loadApprovals();
-      await loadStats();
-    } catch (error: any) {
-      console.error('Failed to approve:', error);
-      toast.error(error.message || 'Failed to approve item');
-    } finally {
-      setProcessingId(null);
-    }
-  };
 
   // Handle rejection
+// const handleReject = async (id: number, type: 'blog' | 'product') => {
+//   try {
+//     setProcessingId(id);
+//     await processApproval({
+//       id: id,
+//       type: type,
+//       action: 'reject'
+//     });
+      
+//       toast.success('Item rejected successfully!');
+      
+//       // Reload data
+//       await loadApprovals();
+//       await loadStats();
+//     } catch (error: any) {
+//       console.error('Failed to reject:', error);
+//       toast.error(error.message || 'Failed to reject item');
+//     } finally {
+//       setProcessingId(null);
+//     }
+//   };
+
+
+
 const handleReject = async (id: number, type: 'blog' | 'product') => {
   try {
     setProcessingId(id);
     await processApproval({
-      id: id,
+      approvalId: id,  // Changed from 'id' to 'approvalId'
       type: type,
       action: 'reject'
     });
-      
-      toast.success('Item rejected successfully!');
-      
-      // Reload data
-      await loadApprovals();
-      await loadStats();
-    } catch (error: any) {
-      console.error('Failed to reject:', error);
-      toast.error(error.message || 'Failed to reject item');
-    } finally {
-      setProcessingId(null);
-    }
-  };
+    
+    toast.success('Item rejected successfully!');
+    
+    // Reload data
+    await loadApprovals();
+    await loadStats();
+  } catch (error: any) {
+    console.error('Failed to reject:', error);
+    toast.error(error.message || 'Failed to reject item');
+  } finally {
+    setProcessingId(null);
+  }
+};
+
+
+
 
   // Reset filters
   const resetFilters = () => {
