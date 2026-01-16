@@ -553,6 +553,10 @@ const NewProducts = () => {
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-3 pt-6">
+
+
+                    <div className="border-t pt-6 mt-6 flex justify-between w-full flex-col ">
+                      <div className="flex justify-between gap-8 w-full pb-6">
                     <button
                       onClick={handleAddToCartFromDialog}
                       disabled={selectedProduct.stock_quantity <= 0 || addingToCart === selectedProduct.id}
@@ -569,6 +573,7 @@ const NewProducts = () => {
                     <button className="flex-1 bg-gray-800 text-white py-3 px-6 rounded-lg font-montserratBold hover:bg-gray-700 transition-colors">
                       Buy Now
                     </button>
+                    </div>
 
 
 
@@ -590,7 +595,7 @@ const NewProducts = () => {
 
 
 
-<div className="border-t pt-6 mt-6">
+{/* <div className="border-t pt-6 mt-6"> */}
   <button
     onClick={() => {
       setIsAgentDialogOpen(true);
