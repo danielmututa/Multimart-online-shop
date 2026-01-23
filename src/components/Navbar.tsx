@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { ChevronDown, Search, ShoppingCart } from 'lucide-react';
 import { NavLink, Link } from 'react-router-dom';
 import Account from '@/Account/Account';
-import { useCart } from './shop/CartContext'; // Import useCart
+import { useCart } from './shop/CartContext';
+import logo from "./Images/ChatGPT Image Jan 23, 2026, 12_18_42 PM.png"  // Import useCart
 
 const Navbar = () => {
   const { cart } = useCart(); // Corrected from cartItems
@@ -24,12 +25,17 @@ const Navbar = () => {
 
   return (
     <div className="hidden lg:flex fixed w-full z-50 justify-between items-center bg-navbar shadow-md py-[18px] px-[100px]">
-      <p className="text-white font-montserratBold text-xl">Dimbo P</p>
+      {/* <p className="text-white font-montserratBold text-xl">Dimbo P</p> */}
+      {/* <p className="text-white font-montserratBold text-xl">Dimbo P</p> */}
 
-      <div className="flex justify-between gap-9" ref={dropdownRef}>
-        <NavLink to="/home" className="text-white font-montserrat hover:font-montserratBold">
+ <NavLink to="/home">
+     <img src={logo} className=' w-[9%] object-cover' alt="" />
+ </NavLink>
+
+      <div className="flex justify-between items-center gap-9" ref={dropdownRef}>
+        {/* <NavLink to="/home" className="text-white font-montserrat hover:font-montserratBold">
           Home
-        </NavLink>
+        </NavLink> */}
 
         {/* Pages dropdown */}
         <div className="relative" onMouseEnter={() => setOpenMenu('pages')}>
@@ -78,10 +84,10 @@ const Navbar = () => {
             </div>
           </div>
         </div>
-      </div>
+
 
       {/* Icons */}
-      <div className="flex justify-between items-center gap-8">
+      <div className="flex justify-between   items-center gap-8">
         <Link to="/search">
         
         <Search  size={18} className='text-white hover:text-buttons font-extrabold'/>
@@ -95,6 +101,9 @@ const Navbar = () => {
           <span className="text-white text-sm font-montserrat">{cart?.length ?? 0}</span> {/* Safe access */}
         </Link>
       </div>
+
+      </div>
+
     </div>
   );
 };

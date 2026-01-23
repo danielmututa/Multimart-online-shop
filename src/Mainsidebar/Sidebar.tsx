@@ -31,6 +31,7 @@ import { FaRegNewspaper } from "react-icons/fa6";
 import { useAuthStore } from "@/context/userContext";
 import { Button } from '@/components/ui/button';
 import { aiReportApi, aiAnalysisApi } from '@/api/aichartApi';
+import logo from "../components/Images/WhatsApp Image 2025-11-01 at 12.22.55_c2924673gf.jpg"
 
 interface AIResponse {
   message: string;
@@ -246,8 +247,9 @@ const MainSidebar = ({ children }: MainSidebarProps) => {
         <Sidebar>
           <SidebarContent>
             <SidebarGroup>
-              <SidebarGroupLabel className='pt-5 md:pt-10'>
-                <p className='text-2xl'>Dimbo P</p>
+              <SidebarGroupLabel className='pt-5 md:pt-10 flex justify-center'>
+                {/* <p className='text-2xl'>Dimbo P</p> */}
+                <img src={logo} className='w-[50%]' alt="" />
               </SidebarGroupLabel>
               <SidebarGroupContent className="pt-10 flex gap-2">
                 <SidebarMenu className="flex gap-2">

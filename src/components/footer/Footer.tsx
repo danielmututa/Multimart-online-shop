@@ -5,8 +5,8 @@ import { FiFacebook } from "react-icons/fi";
 import { FaXTwitter } from "react-icons/fa6";
 import { FaInstagram } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
-
-
+import { NavLink} from 'react-router-dom';
+import logo from "../Images/ChatGPT Image Jan 23, 2026, 12_18_42 PM.png"
 
 const Footer = () => {
      
@@ -72,9 +72,17 @@ const Footer = () => {
 <div className="flex w-full flex-wrap md:flex-nowrap  justify-between md:flex-row ">
     {/* First section - 25% */}
     <div className=" w-[45%] pb-8 md:pb-0 md:w-[23%]  flex flex-col">
-        <h3 className='font-montserratBold pb-2 md:pb-3 text-[18px] text-white'>TechRevive</h3>
+
+
+
+ <NavLink to="/home">
+     <img src={logo} className=' w-[30%] object-cover' alt="" />
+ </NavLink>
+
+
+
         <p className='sm:text-sm md:text-[15px] lg:text-[16px] text-white font-montserrat text-[16px]'>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis esse non volupt!
+           Multimart is your trusted online store offering quality products for everyday needs, combining convenience, affordability, and a smooth shopping experience.
         </p>
     </div>
     
@@ -122,17 +130,17 @@ const Footer = () => {
        
             <div className="flex pt-3 pb-6 md:pb-0   w-[45%] md:w-[23%] items-center gap-2">
                 <HiLocationMarker className='h-[25px] w-[25px] text-white font-montserrat'/>
-                <p className='font-montserrat text-white text-sm md:text-sm lg:text-[16px]'>Lucky Street</p>
+                <p className='font-montserrat text-white text-sm md:text-sm lg:text-[16px]'>Zimbabwe Harare</p>
             </div>
 
             <div className="flex pt-3 pb-6 md:pb-0  w-[45%] md:w-[23%] items-center gap-2">
                 <Phone className='h-[25px] w-[25px] text-white font-montserrat'/>
-                <p className='font-montserrat text-white text-sm md:text-sm lg:text-[16px]'>+263-774006306</p>
+                <p className='font-montserrat text-white text-sm md:text-sm lg:text-[16px]'>+263-775306263</p>
             </div>
 
             <div className="flex  w-[45%] md:w-[23%] items-center gap-2">
                 <FaRegEnvelopeOpen className='h-[25px] w-[25px] text-white font-montserrat'/>
-                <p className='font-montserrat text-white text-sm md:text-sm lg:text-[16px]'>type@gmail.com</p>
+                <p className='font-montserrat text-white text-sm md:text-sm lg:text-[16px]'>omultimart@gmail.com</p>
             </div>
       
   
@@ -151,7 +159,7 @@ const Footer = () => {
 
         <div className='w-full mt-8 border'><span></span></div>
          
-         <p className='text-sm text-white pt-3 md:pt-4 lg:pt-5 xl:pt-6 md:text-[16px] lg:text-[16px] font-montserrat '>@2025 Zimnext Solutions. All Rights Reserved </p>
+         <p className='text-sm text-white pt-3 md:pt-4 lg:pt-5 xl:pt-6 md:text-[16px] lg:text-[16px] font-montserrat '>@2026 Multimart Online Shop. All Rights Reserved </p>
     </div>
   )
 }

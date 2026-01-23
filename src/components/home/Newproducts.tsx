@@ -340,9 +340,7 @@ const NewProducts = () => {
     <div className="px-[20px] py-[50px] flex flex-col items-center justify-center sm:px-[20px] sm:py-[50px] md:px-[40px] lg:px-[100px] lg:py-[80px]">
       <h2 className="pb-2 text-[20px] md:text-[23px] lg:text-[26px] font-montserratBold lg:pb-3">New Products</h2>
       <p className="pb-5 text-sm md:text-[16px] lg:text-[18px] text-gray-500 text-center lg:pb-8">
-        Discover our newest smartphone collection featuring sleek designs, powerful cameras, and top models like iPhone,
-        Samsung Galaxy, and Nokia. Enjoy cutting-edge performance and innovative features that fit your lifestyle. Stay
-        connected and ahead of the curve — shop now!
+       Discover a wide range of quality products designed to fit your everyday lifestyle. From fashion and footwear to home essentials and electronics, Multimart brings you stylish designs, reliable performance, and great value all in one place. Enjoy a seamless shopping experience and stay ahead of the curve — shop smart with Multimart.
       </p>
 
       <div className="flex justify-between w-full flex-wrap">
