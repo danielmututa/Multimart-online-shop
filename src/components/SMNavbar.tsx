@@ -1,9 +1,9 @@
 
 
 
-
+import Account from '@/Account/Account';
 import React, { useState } from 'react';
-import { ChevronDown, Search, ShoppingCart, User } from 'lucide-react';
+import { ChevronDown, Search, ShoppingCart } from 'lucide-react';
 import { NavLink, Link } from 'react-router-dom';
 import { useCart } from './shop/CartContext';
 import logo from "./Images/ChatGPT Image Jan 23, 2026, 12_18_42 PM.png"
@@ -111,16 +111,20 @@ const MobileNavbar: React.FC = () => {
             </div>
 
             <div className="flex justify-between items-center gap-8">
-        <Link to="/search">
+       
+        </div>
+     
+
+            {/* Icons Row */}
+            <div className="flex justify-start space-x-6 pt-4 items-center">
+              {/* <Search size={18} className="text-white" /> */}
+                 <Account />
+               <Link to="/search"  onClick={() => setIsMenuOpen(false)}>
         
         <Search  size={18} className='text-white hover:text-buttons font-extrabold'/>
         </Link>
-        </div>
+              {/* <User size={18} className="text-white" />  */}
 
-            {/* Icons Row */}
-            <div className="flex justify-start space-x-6 pt-4">
-              <Search size={18} className="text-white" />
-              <User size={18} className="text-white" />
               <Link to="/cart" className='relative' onClick={() => setIsMenuOpen(false)}>
                 <ShoppingCart size={18} className="text-white" />
                 <span className="text-white absolute top-0 right-[-6px] text-[8px] font-montserrat">{cart?.length ?? 0}</span>
