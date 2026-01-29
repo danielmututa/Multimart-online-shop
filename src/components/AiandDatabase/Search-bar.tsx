@@ -28,7 +28,7 @@ export function SearchBar({ onSearch, isSearching }: SearchBarProps) {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
             type="text"
-            placeholder="Search everything in your database..."
+           placeholder="Search for products, categories, brands..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="pl-10 h-12 text-base bg-input border-border focus:ring-2 focus:ring-ring"
