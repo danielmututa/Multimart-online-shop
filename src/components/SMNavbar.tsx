@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { ChevronDown, Search, ShoppingCart, User } from 'lucide-react';
 import { NavLink, Link } from 'react-router-dom';
 import { useCart } from './shop/CartContext';
+import logo from "./Images/ChatGPT Image Jan 23, 2026, 12_18_42 PM.png"
 
 const MobileNavbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
@@ -21,7 +22,10 @@ const MobileNavbar: React.FC = () => {
       <div className="container mx-auto px-4">
         {/* Top Bar */}
         <div className="flex justify-between items-center h-16">
-          <p className="text-white font-montserratBold text-xl">Dimbo P</p>
+          {/* <p className="text-white font-montserratBold text-xl">Dimbo P</p> */}
+          <NavLink to="/home">
+               <img src={logo} className=' w-[9%] object-cover' alt="" />
+           </NavLink>
           
           {/* Mobile Menu Button */}
           <button
