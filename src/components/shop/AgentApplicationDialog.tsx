@@ -45,6 +45,8 @@ const AgentApplicationDialog: React.FC<AgentApplicationDialogProps> = ({
     bankAccountNumber: '',
     bankAccountName: '',
     reason: '',
+    email: '',
+    phone: '',
     acceptedTerms: false,
   });
 
@@ -74,10 +76,6 @@ const AgentApplicationDialog: React.FC<AgentApplicationDialogProps> = ({
     setError(null);
     setWarning(null);
 
-    if (!user?.id) {
-      setError('You must be logged in to apply as an agent');
-      return;
-    }
 
     if (!formData.acceptedTerms) {
       setError('You must accept the terms and conditions');
@@ -97,6 +95,8 @@ const AgentApplicationDialog: React.FC<AgentApplicationDialogProps> = ({
         bankAccountNumber: formData.bankAccountNumber,
         bankAccountName: formData.bankAccountName,
         reason: formData.reason,
+        email: !user ? formData.email : undefined,
+        phone: !user ? formData.phone : undefined,
         acceptedTerms: formData.acceptedTerms,
       });
 
@@ -221,6 +221,39 @@ const AgentApplicationDialog: React.FC<AgentApplicationDialogProps> = ({
                 placeholder="e.g., 63-123456-X-21"
               />
             </div>
+
+            {!user && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email Address <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    required={!user}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="your@email.com"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Phone Number <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    required={!user}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="+263..."
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Payout Information */}

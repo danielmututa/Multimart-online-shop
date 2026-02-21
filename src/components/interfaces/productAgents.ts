@@ -43,6 +43,8 @@ export interface AgentApplication {
   productId: number;
   fullName: string;
   nationalId: string;
+  email?: string;
+  phone?: string;
   idDocumentUrl?: string;
   payoutMethod: 'ecocash' | 'bank' | 'paynow' | 'onemoney' | 'telecash';
   payoutNumber?: string;
