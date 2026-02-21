@@ -1168,10 +1168,13 @@
 
 
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import { GetUserCart, AddToCart, UpdateCartItem, DeleteCartItem } from "@/api/cartApi";
+import { GetProductById } from "@/api/productApi";
 import { CartItem, CartContextType } from "@/components/interfaces/cart";
 import { useAuthStore } from "@/context/userContext";
+
+const LOCAL_CART_KEY = "dimbo_guest_cart";
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
@@ -1192,147 +1195,213 @@ export const CartProvider = ({ children }: CartProviderProps) => {
   const { user, token } = useAuthStore();
 
   // ✅ Updated fetchCart to get full product data including stock
-  const fetchCart = async () => {
-    if (!user || !token) {
-      setCart([]);
-      setLoading(false);
+  const fetchCart = useCallback(async () => {
+    // Authenticated Mode
+    if (user?.id && token) {
+      setLoading(true);
+      try {
+        const userCart = await GetUserCart(user.id);
+        console.log('Fetched authenticated cart:', userCart);
+        setCart(userCart.items || []);
+        setError(null);
+      } catch (err) {
+        console.error('Fetch authenticated cart error:', err);
+        setError("Failed to fetch cart. Please try again.");
+      } finally {
+        setLoading(false);
+      }
       return;
     }
 
+    // Guest Mode (localStorage)
     setLoading(true);
     try {
-      const userCart = await GetUserCart(user.id);
-      console.log('Fetched cart data:', userCart);
-      
-      // Keep the full cart items with product data
-      const cartItems = userCart.items || [];
-      setCart(cartItems);
+      const storedCart = localStorage.getItem(LOCAL_CART_KEY);
+      if (storedCart) {
+        const parsedCart = JSON.parse(storedCart);
+        setCart(parsedCart);
+      } else {
+        setCart([]);
+      }
       setError(null);
     } catch (err) {
-      console.error('Fetch cart error:', err);
-      setError("Failed to fetch cart. Please try again.");
+      console.error('Fetch guest cart error:', err);
       setCart([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [user?.id, token]);
+
+  useEffect(() => {
+    fetchCart();
+  }, [fetchCart]);
+
+  // Sync guest cart to server on login
+  useEffect(() => {
+    const syncCart = async () => {
+      if (user?.id && token) {
+        const storedCart = localStorage.getItem(LOCAL_CART_KEY);
+        if (storedCart) {
+          try {
+            const guestCart = JSON.parse(storedCart);
+            if (guestCart.length > 0) {
+              console.log("Syncing guest cart to server...");
+              // Add all guest items to server
+              for (const item of guestCart) {
+                await AddToCart(user.id, item.product_id, item.quantity);
+              }
+              // Clear guest cart
+              localStorage.removeItem(LOCAL_CART_KEY);
+              // Refresh full cart from server
+              await fetchCart();
+            }
+          } catch (err) {
+            console.error("Failed to sync guest cart:", err);
+          }
+        }
+      }
+    };
+
+    syncCart();
+  }, [user?.id, token, fetchCart]);
+
+  const addToCart = async (productId: number, quantity: number = 1, _price?: string) => {
+    setError(null);
+    
+    // Authenticated Mode
+    if (user?.id && token) {
+      try {
+        const result = await AddToCart(user.id, productId, quantity);
+        console.log("API Cart updated:", result);
+        await fetchCart();
+        return { success: true };
+      } catch (error: any) {
+        console.error("Error adding to API cart:", error);
+        const errorMsg = error.response?.data?.error || error.message || "Failed to add to cart";
+        setError(errorMsg);
+        return { success: false, error: errorMsg };
+      }
+    }
+
+    // Guest Mode
+    try {
+      setLoading(true);
+      const guestCart = JSON.parse(localStorage.getItem(LOCAL_CART_KEY) || "[]");
+      const existingItemIndex = guestCart.findIndex((item: CartItem) => item.product_id === productId);
+
+      if (existingItemIndex > -1) {
+        guestCart[existingItemIndex].quantity += quantity;
+        guestCart[existingItemIndex].updated_at = new Date().toISOString();
+      } else {
+        // Fetch product details for the new guest item
+        const product = await GetProductById(productId.toString());
+        
+        const newItem: CartItem = {
+          id: Date.now(), // Temporary ID for guest
+          user_id: null,
+          product_id: productId,
+          quantity: quantity,
+          price: product.price,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          products: {
+            id: product.id,
+            name: product.name,
+            description: product.description || "",
+            price: product.price,
+            stock_quantity: product.stock_quantity,
+            category_id: product.category_id,
+            image_url: product.image_url,
+            created_at: product.created_at || new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            discount_percentage: product.discount_percentage || 0,
+            views: product.views || 0,
+            categories: {
+              id: product.categories?.id || 0,
+              name: product.categories?.name || "Category"
+            }
+          }
+        };
+        guestCart.push(newItem);
+      }
+
+      localStorage.setItem(LOCAL_CART_KEY, JSON.stringify(guestCart));
+      setCart(guestCart);
+      return { success: true };
+    } catch (error: any) {
+      console.error("Error adding to guest cart:", error);
+      const errorMsg = "Failed to add item to guest cart";
+      setError(errorMsg);
+      return { success: false, error: errorMsg };
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchCart();
-  }, [user, token]);
-
-  // const addToCart = async (productId: number, quantity: number) => {
-  //   if (!user?.id) {
-  //     const errorMsg = "User not logged in";
-  //     setError(errorMsg);
-  //     return { success: false, error: errorMsg };
-  //   }
-
-  //   try {
-  //     const result = await AddToCart(user.id, productId, quantity);
-  //     console.log("Cart updated:", result);
-      
-  //     await fetchCart(); // Refresh cart data
-  //     return { success: true };
-  //   } catch (error: any) {
-  //     console.error("Error adding to cart:", error);
-  //     const errorMsg = error.response?.data?.error || error.message || "Failed to add to cart";
-  //     setError(errorMsg);
-  //     return { success: false, error: errorMsg };
-  //   }
-  // };
-
-
-// const addToCart = async (productId: number, quantity?: number, price?: string) => {
-//   if (!user?.id) {
-//     const errorMsg = "User not logged in";
-//     setError(errorMsg);
-//     return { success: false, error: errorMsg };
-//   }
-
-//   try {
-//     // Use the provided quantity or default to 1
-//     const finalQuantity = quantity || 1;
-    
-//     // If you want to use the price parameter in your API call:
-//     const result = await AddToCart(user.id, productId, finalQuantity, price);
-//     console.log("Cart updated:", result);
-    
-//     await fetchCart(); // Refresh cart data
-//     return { success: true };
-//   } catch (error: any) {
-//     console.error("Error adding to cart:", error);
-//     const errorMsg = error.response?.data?.error || error.message || "Failed to add to cart";
-//     setError(errorMsg);
-//     return { success: false, error: errorMsg };
-//   }
-// };
-
-
-const addToCart = async (productId: number, quantity?: number, _price?: string) => {
-  if (!user?.id) {
-    const errorMsg = "User not logged in";
-    setError(errorMsg);
-    return { success: false, error: errorMsg };
-  }
-
-  try {
-    // Use the provided quantity or default to 1
-    const finalQuantity = quantity || 1;
-    
-    const result = await AddToCart(user.id, productId, finalQuantity);
-    console.log("Cart updated:", result);
-    
-    await fetchCart(); // Refresh cart data
-    return { success: true };
-  } catch (error: any) {
-    console.error("Error adding to cart:", error);
-    const errorMsg = error.response?.data?.error || error.message || "Failed to add to cart";
-    setError(errorMsg);
-    return { success: false, error: errorMsg };
-  }
-};
-
-
   const removeFromCart = async (cartItemId: number) => {
-    if (!user?.id || !token) {
-      const errorMsg = "You must be logged in to remove items.";
-      setError(errorMsg);
-      return { success: false, error: errorMsg };
+    setError(null);
+
+    // Authenticated Mode
+    if (user?.id && token) {
+      try {
+        await DeleteCartItem(user.id, cartItemId);
+        await fetchCart();
+        return { success: true };
+      } catch (err: any) {
+        console.error("Error removing from API cart:", err);
+        const errorMsg = err.response?.data?.error || "Failed to remove item.";
+        setError(errorMsg);
+        return { success: false, error: errorMsg };
+      }
     }
 
+    // Guest Mode
     try {
-      await DeleteCartItem(user.id, cartItemId);
-      await fetchCart(); // Refresh cart
+      const guestCart = JSON.parse(localStorage.getItem(LOCAL_CART_KEY) || "[]");
+      const updatedCart = guestCart.filter((item: CartItem) => item.id !== cartItemId);
+      localStorage.setItem(LOCAL_CART_KEY, JSON.stringify(updatedCart));
+      setCart(updatedCart);
       return { success: true };
-    } catch (err: any) {
-      console.error(err);
-      const errorMsg = err.response?.data?.error || "Failed to remove item.";
-      setError(errorMsg);
-      return { success: false, error: errorMsg };
+    } catch (err) {
+      setError("Failed to remove item from guest cart");
+      return { success: false, error: "Failed to remove item" };
     }
   };
 
   const updateQuantity = async (cartItemId: number, newQuantity: number) => {
-    if (!user?.id || !token) {
-      const errorMsg = "You must be logged in to update items.";
-      setError(errorMsg);
-      return { success: false, error: errorMsg };
+    setError(null);
+    if (newQuantity <= 0) return await removeFromCart(cartItemId);
+
+    // Authenticated Mode
+    if (user?.id && token) {
+      try {
+        await UpdateCartItem(user.id, cartItemId, newQuantity);
+        await fetchCart();
+        return { success: true };
+      } catch (err: any) {
+        console.error("Error updating API cart:", err);
+        const errorMsg = err.response?.data?.error || "Failed to update quantity.";
+        setError(errorMsg);
+        return { success: false, error: errorMsg };
+      }
     }
 
-    if (newQuantity <= 0) {
-      return await removeFromCart(cartItemId);
-    }
-
+    // Guest Mode
     try {
-      await UpdateCartItem(user.id, cartItemId, newQuantity);
-      await fetchCart(); // Refresh cart
-      return { success: true };
-    } catch (err: any) {
-      console.error(err);
-      const errorMsg = err.response?.data?.error || "Failed to update quantity.";
-      setError(errorMsg);
-      return { success: false, error: errorMsg };
+      const guestCart = JSON.parse(localStorage.getItem(LOCAL_CART_KEY) || "[]");
+      const itemIndex = guestCart.findIndex((item: CartItem) => item.id === cartItemId);
+      
+      if (itemIndex > -1) {
+        guestCart[itemIndex].quantity = newQuantity;
+        guestCart[itemIndex].updated_at = new Date().toISOString();
+        localStorage.setItem(LOCAL_CART_KEY, JSON.stringify(guestCart));
+        setCart(guestCart);
+        return { success: true };
+      }
+      return { success: false, error: "Item not found" };
+    } catch (err) {
+      setError("Failed to update guest cart");
+      return { success: false, error: "Failed to update quantity" };
     }
   };
 
