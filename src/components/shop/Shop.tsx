@@ -48,15 +48,11 @@ interface Toast {
 }
 
 const Shop: React.FC = () => {
-  // Backend data states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [displayedProducts, setDisplayedProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
 
   // Filter states
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -81,11 +77,15 @@ const Shop: React.FC = () => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
 
-  const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://dimpo-pbackend.onrender.com';
-  const getImageUrl = (url: string) => url.startsWith('http') ? url : `${BASE_URL}${url}`;
+  // Search states
+  const [productSearch, setProductSearch] = useState('');
+  const [categorySearch, setCategorySearch] = useState('');
+  const [brandSearch, setBrandSearch] = useState('');
+
   const ITEMS_PER_PAGE = 9;
 
-  // Fixed category display function - same as NewProducts
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://dimpo-pbackend.onrender.com';
+  const getImageUrl = (url: string) => url.startsWith('http') ? url : `${BASE_URL}${url}`;
   const getProductCategoryName = (product: Product): string => {
     // The categories field is an object with id and name properties
     if (product.categories && product.categories.name) {
@@ -96,48 +96,23 @@ const Shop: React.FC = () => {
     return "Unknown Category";
   };
 
-  // Fetch products from API
-  const fetchProducts = async (page: number = 1, append: boolean = false) => {
+  const fetchProducts = async () => {
     try {
-      if (page === 1 && !append) setLoading(true);
-      if (page > 1) setLoadingMore(true);
-
+      setLoading(true);
       const response = await apiClient.get('/api/products');
       const products = response.data;
+      setAllProducts(products);
       
-      console.log("Products API Response:", response.data);
-      
-      // Debug first product structure
-      if (response.data && response.data.length > 0) {
-        console.log("First product structure:", response.data[0]);
-        console.log("First product categories:", response.data[0].categories);
-      }
-      
-      if (page === 1 && !append) {
-        setAllProducts(products);
-        const initialProducts = products.slice(0, ITEMS_PER_PAGE);
-        setDisplayedProducts(initialProducts);
-        setHasMore(products.length > ITEMS_PER_PAGE);
-        setCurrentPage(1);
-      } else {
-        const startIndex = (page - 1) * ITEMS_PER_PAGE;
-        const endIndex = startIndex + ITEMS_PER_PAGE;
-        const newProducts = products.slice(startIndex, endIndex);
-        
-        if (newProducts.length > 0) {
-          setDisplayedProducts(prev => [...prev, ...newProducts]);
-          setCurrentPage(page);
-        }
-        
-        setHasMore(endIndex < products.length);
-      }
+      const highestPrice = Math.max(...products.map((p: any) => parseFloat(p.price)), 1000);
+      setPriceRange(prev => ({ ...prev, max: Math.ceil(highestPrice) }));
+
     } catch (err) {
       const e = err instanceof Error ? err : new Error('Unknown error');
+      console.error(`Failed to load products: ${e.message}`);
       setError(e);
       showToast(`Failed to load products: ${e.message}`, 'error');
     } finally {
       setLoading(false);
-      setLoadingMore(false);
     }
   };
 
@@ -169,14 +144,17 @@ const Shop: React.FC = () => {
     }
   }, [cartError, clearError]);
 
-  // Apply filters to displayed products - Fixed category filtering
-  const filteredProducts = displayedProducts.filter((item: Product) => {
+  // Apply all filters
+  const filteredProducts = allProducts.filter((item: Product) => {
+    const matchesSearch = productSearch === '' || 
+      item.name.toLowerCase().includes(productSearch.toLowerCase()) ||
+      (item.description && item.description.toLowerCase().includes(productSearch.toLowerCase()));
+
     const matchesCategory = !selectedCategory || 
       (item.categories && item.categories.name === selectedCategory);
     
     const matchesBrand = !selectedBrand || item.name.toLowerCase().includes(selectedBrand.toLowerCase());
 
-    // Handle price filtering
     const price = parseFloat(item.price);
     const matchesPrice = price >= priceRange.min && price <= priceRange.max;
 
@@ -185,18 +163,20 @@ const Shop: React.FC = () => {
         stockFilter === 'inStock' ? item.stock_quantity > 0 :
           item.stock_quantity <= 0;
 
-    return matchesCategory && matchesBrand && matchesPrice && matchesStock;
+    return matchesSearch && matchesCategory && matchesBrand && matchesPrice && matchesStock;
   });
 
-  // Get unique brands from all products
-  const brands = [...new Set(allProducts.map(item => item.name))];
+  // Calculate pagination
+  const totalItems = filteredProducts.length;
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
-  // Load more products
-  const loadMoreProducts = () => {
-    if (!loadingMore && hasMore) {
-      fetchProducts(currentPage + 1, true);
-    }
-  };
+  // Load more products - no longer used as we use pagination buttons
+
+  // Load more products - no longer used as we use pagination buttons
 
   // Dialog functions
   const openDialog = (product: Product) => {
@@ -414,46 +394,80 @@ const Shop: React.FC = () => {
     return product.reviews || [];
   };
 
-  if (loading) return <div className="text-center py-10">Loading products...</div>;
-  if (error) return <div className="text-red-500 text-center py-10">{error.message}</div>;
+  if (loading) return (
+    <div className="flex flex-col items-center justify-center py-20 min-h-[60vh]">
+      <div className="w-12 h-12 border-4 border-buttons border-t-transparent rounded-full animate-spin mb-4"></div>
+      <p className="text-gray-500 font-montserratBold animate-pulse">Loading amazing products...</p>
+    </div>
+  );
+  
+  if (error) return (
+    <div className="flex flex-col items-center justify-center py-20 min-h-[60vh]">
+      <div className="bg-red-50 p-6 rounded-2xl border border-red-100 text-center max-w-md">
+        <X size={48} className="text-red-500 mx-auto mb-4" />
+        <h3 className="text-xl font-montserratBold text-red-900 mb-2">Oops! Something went wrong</h3>
+        <p className="text-red-600 mb-6">{error.message}</p>
+        <button 
+          onClick={() => fetchProducts()}
+          className="bg-red-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-red-600 transition-all"
+        >
+          Try Again
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <div className='flex flex-col lg:flex-row justify-between pt-[100px] px-4 lg:px-[100px] gap-8'>
       {/* Sidebar with all filters */}
-      <div className="lg:w-1/4 space-y-8 bg-white p-6 lg:pl-0 lg:pb-0 lg:pt-0 pr-6 rounded-lg shadow-sm">
+      <div className="lg:w-1/4 space-y-8 bg-white/50 backdrop-blur-md p-6 rounded-2xl shadow-xl border border-white/20 h-fit">
+        {/* Global Product Search */}
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={productSearch}
+            onChange={(e) => { setProductSearch(e.target.value); setCurrentPage(1); }}
+            className="w-full pl-10 pr-4 py-3 bg-white/80 border border-gray-200 rounded-xl focus:ring-2 focus:ring-buttons outline-none transition-all"
+          />
+          <Star className="absolute left-3 top-3.5 text-gray-400 rotate-45" size={18} />
+        </div>
+
         {/* Categories Filter */}
         <div>
-          <h3 className='text-lg font-bold mb-4 text-gray-800 border-b pb-2'>Categories</h3>
-          <ul className="space-y-2">
+          <h3 className='text-lg font-montserratBold mb-4 text-gray-800 border-b border-gray-100 pb-2'>Categories</h3>
+          <div className="mb-4 relative">
+             <input 
+               type="text" 
+               placeholder="Search categories..." 
+               value={categorySearch}
+               onChange={(e) => setCategorySearch(e.target.value)}
+               className="w-full text-xs p-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-buttons"
+             />
+          </div>
+          <ul className="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
             <li
-              className={`cursor-pointer transition-colors duration-200 ${
+              className={`cursor-pointer p-2 rounded-lg transition-all duration-200 ${
                 selectedCategory === null
-                  ? "text-navbar font-semibold"
-                  : "text-gray-600 hover:text-navbar"
+                  ? "bg-buttons text-white shadow-md font-semibold"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-buttons"
               }`}
-              onClick={() => setSelectedCategory(null)}
+              onClick={() => { setSelectedCategory(null); setCurrentPage(1); }}
             >
               All Categories
             </li>
-            {categories.map((category) => (
+            {categories
+              .filter(c => c.name.toLowerCase().includes(categorySearch.toLowerCase()))
+              .map((category) => (
               <li
                 key={category.id}
-                className={`cursor-pointer transition-colors duration-200 flex items-center gap-2 ${
+                className={`cursor-pointer p-2 rounded-lg transition-all duration-200 flex items-center gap-2 ${
                   selectedCategory === category.name
-                    ? "text-navbar font-semibold"
-                    : "text-gray-600 hover:text-navbar"
+                    ? "bg-buttons text-white shadow-md font-semibold"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-buttons"
                 }`}
-                onClick={() => setSelectedCategory(category.name)}
+                onClick={() => { setSelectedCategory(category.name); setCurrentPage(1); }}
               >
-                <span className={`w-4 h-4 border rounded-full flex items-center justify-center ${
-                  selectedCategory === category.name
-                    ? "border-navbar"
-                    : "border-gray-300"
-                }`}>
-                  {selectedCategory === category.name && (
-                    <span className="w-2 h-2 bg-navbar rounded-full" />
-                  )}
-                </span>
                 <span>{category.name}</span>
               </li>
             ))}
@@ -462,28 +476,34 @@ const Shop: React.FC = () => {
 
         {/* Price Range Filter */}
         <div>
-          <h3 className='text-lg font-bold mb-4 text-gray-800 border-b pb-2'>Price Range</h3>
-          <div className="space-y-4">
-            <div className="flex flex-col space-y-2">
-              <label className="text-sm text-gray-600">Minimum Price: ${priceRange.min}</label>
+          <h3 className='text-lg font-montserratBold mb-4 text-gray-800 border-b border-gray-100 pb-2'>Price Range</h3>
+          <div className="space-y-6">
+            <div className="flex flex-col space-y-3">
+              <div className="flex justify-between text-xs font-bold text-gray-500 uppercase">
+                <span>Min</span>
+                <span>${priceRange.min}</span>
+              </div>
               <input
                 type="range"
                 min="0"
-                max="1000"
+                max={priceRange.max}
                 value={priceRange.min}
-                onChange={(e) => setPriceRange(prev => ({ ...prev, min: parseInt(e.target.value) }))}
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-navbar"
+                onChange={(e) => { setPriceRange(prev => ({ ...prev, min: parseInt(e.target.value) })); setCurrentPage(1); }}
+                className="w-full h-1.5 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-buttons"
               />
             </div>
-            <div className="flex flex-col space-y-2">
-              <label className="text-sm text-gray-600">Maximum Price: ${priceRange.max}</label>
+            <div className="flex flex-col space-y-3">
+              <div className="flex justify-between text-xs font-bold text-gray-500 uppercase">
+                <span>Max</span>
+                <span>${priceRange.max}</span>
+              </div>
               <input
                 type="range"
                 min="0"
-                max="1000"
+                max={Math.max(...allProducts.map(p => parseFloat(p.price)), 1000)}
                 value={priceRange.max}
-                onChange={(e) => setPriceRange(prev => ({ ...prev, max: parseInt(e.target.value) }))}
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-navbar"
+                onChange={(e) => { setPriceRange(prev => ({ ...prev, max: parseInt(e.target.value) })); setCurrentPage(1); }}
+                className="w-full h-1.5 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-buttons"
               />
             </div>
           </div>
@@ -491,37 +511,40 @@ const Shop: React.FC = () => {
 
         {/* Brand Filter */}
         <div>
-          <h3 className='text-lg font-bold mb-4 text-gray-800 border-b pb-2'>Brands</h3>
-          <ul className="space-y-2">
+          <h3 className='text-lg font-montserratBold mb-4 text-gray-800 border-b border-gray-100 pb-2'>Brands</h3>
+          <div className="mb-4 relative">
+             <input 
+               type="text" 
+               placeholder="Search brands..." 
+               value={brandSearch}
+               onChange={(e) => setBrandSearch(e.target.value)}
+               className="w-full text-xs p-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-buttons"
+             />
+          </div>
+          <ul className="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
             <li
-              className={`cursor-pointer transition-colors duration-200 ${
+              className={`cursor-pointer p-2 rounded-lg transition-all duration-200 ${
                 selectedBrand === null
-                  ? "text-navbar font-semibold"
-                  : "text-gray-600 hover:text-navbar"
+                  ? "bg-buttons text-white shadow-md font-semibold"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-buttons"
               }`}
-              onClick={() => setSelectedBrand(null)}
+              onClick={() => { setSelectedBrand(null); setCurrentPage(1); }}
             >
               All Brands
             </li>
-            {brands.slice(0, 10).map((brand, index) => (
+            {[...new Set(allProducts.map(item => item.name.split(' ')[0]))]
+              .filter(b => b.toLowerCase().includes(brandSearch.toLowerCase()))
+              .slice(0, 20)
+              .map((brand, index) => (
               <li
                 key={index}
-                className={`cursor-pointer transition-colors duration-200 flex items-center gap-2 ${
+                className={`cursor-pointer p-2 rounded-lg transition-all duration-200 ${
                   selectedBrand === brand
-                    ? "text-navbar font-semibold"
-                    : "text-gray-600 hover:text-navbar"
+                    ? "bg-buttons text-white shadow-md font-semibold"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-buttons"
                 }`}
-                onClick={() => setSelectedBrand(brand)}
+                onClick={() => { setSelectedBrand(brand); setCurrentPage(1); }}
               >
-                <span className={`w-4 h-4 border rounded-full flex items-center justify-center ${
-                  selectedBrand === brand
-                    ? "border-navbar"
-                    : "border-gray-300"
-                }`}>
-                  {selectedBrand === brand && (
-                    <span className="w-2 h-2 bg-navbar rounded-full" />
-                  )}
-                </span>
                 <span>{brand}</span>
               </li>
             ))}
@@ -530,151 +553,165 @@ const Shop: React.FC = () => {
 
         {/* Stock Filter */}
         <div>
-          <h3 className='text-lg font-bold mb-4 text-gray-800 border-b pb-2'>Availability</h3>
+          <h3 className='text-lg font-montserratBold mb-4 text-gray-800 border-b border-gray-100 pb-2'>Availability</h3>
           <ul className="space-y-2">
-            <li
-              className={`cursor-pointer transition-colors duration-200 ${
-                stockFilter === 'all'
-                  ? "text-navbar font-semibold"
-                  : "text-gray-600 hover:text-navbar"
-              }`}
-              onClick={() => setStockFilter('all')}
-            >
-              All Items
-            </li>
-            <li
-              className={`cursor-pointer transition-colors duration-200 flex items-center gap-2 ${
-                stockFilter === 'inStock'
-                  ? "text-navbar font-semibold"
-                  : "text-gray-600 hover:text-navbar"
-              }`}
-              onClick={() => setStockFilter('inStock')}
-            >
-              <span className={`w-4 h-4 border rounded-full flex items-center justify-center ${
-                stockFilter === 'inStock'
-                  ? "border-navbar"
-                  : "border-gray-300"
-              }`}>
-                {stockFilter === 'inStock' && (
-                  <span className="w-2 h-2 bg-navbar rounded-full" />
-                )}
-              </span>
-              In Stock
-            </li>
-            <li
-              className={`cursor-pointer transition-colors duration-200 flex items-center gap-2 ${
-                stockFilter === 'outStock'
-                  ? "text-navbar font-semibold"
-                  : "text-gray-600 hover:text-navbar"
-              }`}
-              onClick={() => setStockFilter('outStock')}
-            >
-              <span className={`w-4 h-4 border rounded-full flex items-center justify-center ${
-                stockFilter === 'outStock'
-                  ? "border-navbar"
-                  : "border-gray-300"
-              }`}>
-                {stockFilter === 'outStock' && (
-                  <span className="w-2 h-2 bg-navbar rounded-full" />
-                )}
-              </span>
-              Out of Stock
-            </li>
+            {[
+              { id: 'all', label: 'All Items' },
+              { id: 'inStock', label: 'In Stock' },
+              { id: 'outStock', label: 'Coming Soon' }
+            ].map((option) => (
+              <li
+                key={option.id}
+                className={`cursor-pointer p-2 rounded-lg transition-all duration-200 flex items-center justify-between ${
+                  stockFilter === option.id
+                    ? "bg-buttons/10 text-buttons font-bold"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-buttons"
+                }`}
+                onClick={() => { setStockFilter(option.id as any); setCurrentPage(1); }}
+              >
+                <span>{option.label}</span>
+                {stockFilter === option.id && <Check size={16} />}
+              </li>
+            ))}
           </ul>
         </div>
+
+        <button 
+          onClick={() => navigate('/register')}
+          className="w-full mt-4 bg-gradient-to-r from-buttons to-purple-600 text-white p-4 rounded-xl font-montserratBold shadow-lg hover:shadow-buttons/40 transition-all flex items-center justify-center gap-2 group"
+        >
+          Become an Agent
+          <span className="group-hover:translate-x-1 transition-transform">→</span>
+        </button>
       </div>
 
       {/* Product Section */}
       <div className="lg:w-3/4">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xl lg:text-2xl font-bold text-gray-800">
-            Products ({filteredProducts.length})
-          </h3>
+        <div className="flex justify-between items-center mb-8 border-b border-gray-100 pb-4">
+          <div>
+            <h3 className="text-xl lg:text-3xl font-montserratBold text-gray-800">
+              {selectedCategory || 'Our Collection'}
+            </h3>
+            <p className="text-sm text-gray-400 mt-1">Showing {paginatedProducts.length} of {totalItems} products</p>
+          </div>
+          <div className="flex gap-2">
+             <button 
+               onClick={() => {
+                 setProductSearch('');
+                 setSelectedCategory(null);
+                 setSelectedBrand(null);
+                 setStockFilter('all');
+               }}
+               className="text-xs font-bold text-gray-400 hover:text-buttons underline"
+             >
+               Reset Filters
+             </button>
+          </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProducts.map((card) => {
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {paginatedProducts.map((card) => {
             const isInWishlist = wishlist.some(item => item.id === card.id);
             const isAddingThis = addingToCart === card.id;
             const inStock = card.stock_quantity > 0;
 
             return (
-              <div key={card.id} className="group relative bg-white overflow-hidden">
-                <div className="relative aspect-square overflow-hidden">
+              <div key={card.id} className="group relative bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-50 flex flex-col h-[480px]">
+                <div className="relative h-[320px] overflow-hidden">
                   <img
                     loading='lazy'
                     src={getImageUrl(card.image_url)}
                     alt={card.name}
-                    className="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105"
-                    onError={e => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = '/placeholder-image.jpg';
-                    }}
+                    className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
+                    onError={e => { (e.target as HTMLImageElement).src = '/api/products/placeholder.jpg'; }}
                   />
+                  
+                  {/* Glassmorphism overlays */}
+                  <div className="absolute inset-0 bg-black/5 group-hover:bg-black/0 transition-colors" />
+                  
+                  {/* Stock/Sale Badges */}
+                  <div className="absolute top-4 left-4 flex flex-col gap-2">
+                    {card.discount_percentage && card.discount_percentage > 0 ? (
+                      <div className="bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-lg">
+                        -{card.discount_percentage}% OFF
+                      </div>
+                    ) : null}
+                    {!inStock ? (
+                      <div className="bg-gray-800/80 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-lg">
+                        COMING SOON
+                      </div>
+                    ) : card.stock_quantity <= 5 ? (
+                      <div className="bg-orange-500 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-lg">
+                        ONLY {card.stock_quantity} LEFT
+                      </div>
+                    ) : null}
+                  </div>
 
-                  {/* Stock indicators */}
-                  {inStock ? (
-                    <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
-                      {card.stock_quantity} in stock
-                    </div>
-                  ) : (
-                    <div className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
-                      Out of Stock
-                    </div>
-                  )}
-
-                  {/* Icons Container - Fixed for mobile */}
-                  <div className="absolute top-0 right-4 h-full flex items-center gap-4 flex-col justify-center sm:opacity-0 sm:translate-y-5 sm:group-hover:opacity-100 sm:group-hover:translate-y-0 transition-all duration-300">
+                  {/* Quick Action Sidebar (Glassmorphism) */}
+                  <div className="absolute top-1/2 -translate-y-1/2 right-4 flex flex-col gap-3 opacity-0 translate-x-10 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 z-10">
                     <button
                       onClick={(e) => handleAddToWishlist(card, e)}
-                      className={`p-2 rounded-full shadow-md hover:scale-110 transition-transform ${
-                        isInWishlist ? 'bg-red-500 text-white' : 'bg-white hover:text-buttons'
+                      className={`p-3 rounded-2xl backdrop-blur-md border border-white/40 shadow-xl transition-all hover:scale-110 ${
+                        isInWishlist ? 'bg-red-500 text-white' : 'bg-white/90 text-gray-800 hover:text-buttons'
                       }`}
                     >
-                      <Heart size={18} fill={isInWishlist ? 'currentColor' : 'none'} />
+                      <Heart size={20} fill={isInWishlist ? 'currentColor' : 'none'} />
                     </button>
                     <button
                       onClick={() => openDialog(card)}
-                      className="p-2 bg-white rounded-full shadow-md hover:scale-110 transition-transform hover:text-buttons"
+                      className="p-3 bg-white/90 backdrop-blur-md border border-white/40 rounded-2xl shadow-xl transition-all hover:scale-110 text-gray-800 hover:text-buttons"
                     >
-                      <Plus size={18} />
+                      <Plus size={20} />
                     </button>
                     <button
                       onClick={(e) => handleAddToCart(card, e)}
                       disabled={!inStock || isAddingThis}
-                      className={`p-2 rounded-full shadow-md hover:scale-110 transition-transform ${
-                        !inStock ? 'bg-gray-300 cursor-not-allowed' : 
-                        isAddingThis ? 'bg-blue-500 text-white cursor-wait' : 
-                        'bg-white hover:text-buttons'
+                      className={`p-3 rounded-2xl backdrop-blur-md border border-white/40 shadow-xl transition-all hover:scale-110 ${
+                        !inStock ? 'bg-gray-300/50 cursor-not-allowed text-gray-500' : 
+                        isAddingThis ? 'bg-buttons text-white cursor-wait' : 
+                        'bg-white/90 text-gray-800 hover:text-buttons'
                       }`}
                     >
                       {isAddingThis ? (
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-5 h-5 border-2 border-buttons border-t-transparent rounded-full animate-spin"></div>
                       ) : (
-                        <ShoppingCart size={18} />
+                        <ShoppingCart size={20} />
                       )}
                     </button>
-                  </div>
+                   </div>
                 </div>
-                <div className="p-4">
-                  <p className='text-sm text-gray-500'>
-                    {getProductCategoryName(card)}
-                  </p>
-                  <p className='text-lg font-semibold mt-1 group-hover:text-buttons transition-colors duration-300'>
+
+                <div className="p-6 flex flex-col flex-1">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className='text-[10px] font-bold text-buttons uppercase tracking-widest bg-buttons/5 px-2 py-0.5 rounded'>
+                      {getProductCategoryName(card)}
+                    </span>
+                    <div className="flex gap-0.5">
+                      {renderStars(card.rating ?? 4.5, card.id)}
+                    </div>
+                  </div>
+                  
+                  <h4 className='text-lg font-montserratBold text-gray-800 line-clamp-1 group-hover:text-buttons transition-colors'>
                     {card.name}
-                  </p>
-                  <p className='text-lg font-bold text-gray-900 mt-2'>
-                    ${parseFloat(card.price).toFixed(2)}
-                    {card.discount_percentage && card.discount_percentage > 0 && (
-                      <span className="text-red-500 ml-2 text-sm">-{card.discount_percentage}%</span>
-                    )}
-                  </p>
-                  <p className={`text-sm mt-2 ${
-                    inStock ? "text-green-600" : "text-red-500"
-                  }`}>
-                    {inStock ? `${card.stock_quantity} In Stock` : 'Out of Stock'}
-                  </p>
-                  <div className="flex items-center gap-1 mt-2">
-                    {renderStars(card.rating ?? 4.5, card.id)}
+                  </h4>
+                  
+                  <div className="mt-auto pt-4 flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <p className='text-2xl font-montserratBold text-gray-900'>
+                        ${parseFloat(card.price).toFixed(2)}
+                      </p>
+                      {card.discount_percentage && card.discount_percentage > 0 && (
+                        <p className="text-xs text-gray-400 line-through">
+                          ${(parseFloat(card.price) / (1 - card.discount_percentage/100)).toFixed(2)}
+                        </p>
+                      )}
+                    </div>
+                    <button 
+                      onClick={() => openDialog(card)}
+                      className="text-xs font-bold text-buttons border-b-2 border-transparent hover:border-buttons transition-all uppercase tracking-tighter"
+                    >
+                      Quick View
+                    </button>
                   </div>
                 </div>
               </div>
@@ -682,22 +719,56 @@ const Shop: React.FC = () => {
           })}
         </div>
 
-        {/* Load More Button */}
-        {hasMore && (
-          <div className="flex justify-center mt-8">
-            <button
-              onClick={loadMoreProducts}
-              disabled={loadingMore}
-              className="bg-buttons text-white px-8 py-3 rounded-lg font-bold hover:bg-opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        {/* Pagination Section */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-3 mt-12 mb-20">
+            <button 
+              onClick={() => { setCurrentPage(prev => Math.max(prev - 1, 1)); window.scrollTo(0, 0); }}
+              disabled={currentPage === 1}
+              className="p-3 rounded-xl border border-gray-200 hover:bg-buttons hover:border-buttons hover:text-white transition-all disabled:opacity-30"
             >
-              {loadingMore ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Loading...
-                </div>
-              ) : (
-                'Load More Products'
-              )}
+              <Minus size={20} />
+            </button>
+            <div className="flex gap-2">
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => { setCurrentPage(i + 1); window.scrollTo(0, 0); }}
+                  className={`w-12 h-12 rounded-xl font-bold transition-all ${
+                    currentPage === i + 1 
+                      ? 'bg-buttons text-white shadow-lg shadow-buttons/30' 
+                      : 'bg-white border border-gray-100 text-gray-400 hover:border-buttons hover:text-buttons'
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+            <button 
+              onClick={() => { setCurrentPage(prev => Math.min(prev + 1, totalPages)); window.scrollTo(0, 0); }}
+              disabled={currentPage === totalPages}
+              className="p-3 rounded-xl border border-gray-200 hover:bg-buttons hover:border-buttons hover:text-white transition-all disabled:opacity-30"
+            >
+              <Plus size={20} />
+            </button>
+          </div>
+        )}
+
+        {filteredProducts.length === 0 && !false && ( // 'loading' was removed, replaced with false
+          <div className="flex flex-col items-center justify-center py-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+            <X size={48} className="text-gray-300 mb-4" />
+            <h3 className="text-xl font-montserratBold text-gray-500">No products found</h3>
+            <p className="text-gray-400">Try adjusting your filters or search terms</p>
+            <button 
+              onClick={() => {
+                setProductSearch('');
+                setSelectedCategory(null);
+                setSelectedBrand(null);
+                setStockFilter('all');
+              }}
+              className="mt-6 text-buttons font-bold hover:underline"
+            >
+              Clear all filters
             </button>
           </div>
         )}
@@ -706,11 +777,11 @@ const Shop: React.FC = () => {
       {/* Enhanced Product Detail Dialog - Same as NewProducts */}
       {isDialogOpen && selectedProduct && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 backdrop-blur-md bg-black/40 flex items-center justify-center z-50 p-4"
           onClick={closeDialog}
         >
           <div
-            className="bg-white rounded-lg w-full max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-4xl xl:max-w-5xl max-h-[90vh] overflow-y-auto mx-4"
+            className="bg-white/95 backdrop-blur-xl rounded-3xl w-full max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-4xl xl:max-w-5xl max-h-[95vh] overflow-y-auto mx-4 shadow-2xl border border-white/20"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex flex-col lg:flex-row">
