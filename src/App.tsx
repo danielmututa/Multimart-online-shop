@@ -51,8 +51,6 @@ const SubscriptionPlans = lazy(() => import('./pages/subscription/SubscriptionPl
 const BlogAndProductsApprovalPage = lazy(() => import('./pages/BlogAndProductsApproval'));
 
 
-// const Agentreviews = lazy(() => import('./components/shop/MyAgentApplications'));
-
 function App() {
   const { initializeAuth } = useAuthStore();
   
@@ -65,83 +63,77 @@ function App() {
       <CartProvider>
         <Suspense fallback={<div>Loading...</div>}>
           <Routes>
-            {/* OAuth Callback Route - MUST BE OUTSIDE PROTECTED ROUTES */}
+            {/* OAuth Callback Route */}
             <Route path="/oauth/callback" element={<OAuthCallback />} />
 
-            {/* Auth routes (accessible to everyone) */}
+            {/* Auth routes - login/register (accessible when NOT logged in) */}
             <Route element={<AuthRoute />}>
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<SelectrolePage />} />
-              <Route path="/register/user" element={<RegisterPage role="client" />} />
               <Route path="/register/admin" element={<RegisterPage role="client_admin" />} />
-              <Route path="/register/agent" element={<RegisterPage role="agent" />} /> {/* ✅ ADDED */}
             </Route>
 
 
-
- 
-
-
-            {/* User/Client routes - for regular customers */}
-            <Route element={<RoleProtectedRoute requiredRole="user" redirectTo="/login" />}>
-              <Route path="/home" element={<><Navbar /><MediaNavbar /><Home /><Footer /></>} />
-              <Route path="/search" element={<><Navbar /><MediaNavbar /><AIChartbot /><Footer /></>} />
-              <Route path="/blog" element={<><Navbar /><MediaNavbar /><Blog /><Footer /></>} />
-              <Route path="/blog/:id" element={<><Navbar /><MediaNavbar /><Blog /><Footer /></>} />
-              <Route path="/blogarticle" element={<><Navbar /><MediaNavbar /><Blogarticle /><Footer /></>} />
-              <Route path="/about" element={<><Navbar /><MediaNavbar /><Aboutus /><Footer /></>} />
-              <Route path="/team" element={<><Navbar /><MediaNavbar /><Aboutteam /><Footer /></>} />
-              <Route path="/services" element={<><Navbar /><MediaNavbar /><Services /><Footer /></>} />
-              <Route path="/contact" element={<><Navbar /><MediaNavbar /><Contactpage /><Footer /></>} />
-              <Route path="/faq" element={<><Navbar /><MediaNavbar /><FQA /><Footer /></>} />
-              <Route path="/whilelist" element={<><Navbar /><MediaNavbar /><Whilelist /><Footer /></>} />
-              <Route path="/shop" element={<><Navbar /><MediaNavbar /><Shop /><Footer /></>} />
-              <Route path="/categories" element={<><Navbar /><MediaNavbar /><Categories /><Footer /></>} />
-              <Route path="/account" element={<><Navbar /><MediaNavbar /><Account /><Footer /></>} />
-              <Route path="/cart" element={<><Navbar /><MediaNavbar /><CartItems /><Footer /></>} />
-              <Route path="/bill" element={<><Navbar /><MediaNavbar /><PaymentForm /><Footer /></>} />
-              {/* <Route path="/bill" element={<><Navbar /><MediaNavbar /><PaymentForm /><Footer /></>} /> */}
-            </Route>
+            {/* ============================================ */}
+            {/* PUBLIC ROUTES - No login required for clients */}
+            {/* ============================================ */}
+            <Route path="/" element={<><Navbar /><MediaNavbar /><Home /><Footer /></>} />
+            <Route path="/home" element={<><Navbar /><MediaNavbar /><Home /><Footer /></>} />
+            <Route path="/search" element={<><Navbar /><MediaNavbar /><AIChartbot /><Footer /></>} />
+            <Route path="/blog" element={<><Navbar /><MediaNavbar /><Blog /><Footer /></>} />
+            <Route path="/blog/:id" element={<><Navbar /><MediaNavbar /><Blog /><Footer /></>} />
+            <Route path="/blogarticle" element={<><Navbar /><MediaNavbar /><Blogarticle /><Footer /></>} />
+            <Route path="/about" element={<><Navbar /><MediaNavbar /><Aboutus /><Footer /></>} />
+            <Route path="/team" element={<><Navbar /><MediaNavbar /><Aboutteam /><Footer /></>} />
+            <Route path="/services" element={<><Navbar /><MediaNavbar /><Services /><Footer /></>} />
+            <Route path="/contact" element={<><Navbar /><MediaNavbar /><Contactpage /><Footer /></>} />
+            <Route path="/faq" element={<><Navbar /><MediaNavbar /><FQA /><Footer /></>} />
+            <Route path="/whilelist" element={<><Navbar /><MediaNavbar /><Whilelist /><Footer /></>} />
+            <Route path="/shop" element={<><Navbar /><MediaNavbar /><Shop /><Footer /></>} />
+            <Route path="/categories" element={<><Navbar /><MediaNavbar /><Categories /><Footer /></>} />
+            <Route path="/account" element={<><Navbar /><MediaNavbar /><Account /><Footer /></>} />
+            <Route path="/cart" element={<><Navbar /><MediaNavbar /><CartItems /><Footer /></>} />
+            <Route path="/bill" element={<><Navbar /><MediaNavbar /><PaymentForm /><Footer /></>} />
 
 
-            {/* Admin routes - for all admin types */}
-            <Route element={<RoleProtectedRoute requiredRole="admin" redirectTo="/home" />}>
-              <Route path="/" element={<HomePage />} />
+            {/* ============================================ */}
+            {/* ADMIN ROUTES - for super_admin & digital_marketer_admin */}
+            {/* ============================================ */}
+            <Route element={<RoleProtectedRoute requiredRole="admin" redirectTo="/" />}>
+              <Route path="/admin-dashboard" element={<HomePage />} />
               <Route path="/feedback" element={<FeedbackPage />} />
               <Route path="/orders" element={<OrdersPage />} />
-              {/* <Route path="/products" element={<ProductsPage />} /> */}
 
+              <Route 
+                path="/products" 
+                element={
+                  <ProductGuard>
+                    <ProductsPage />
+                  </ProductGuard>
+                } 
+              />
+              
+              <Route 
+                path="/blogs" 
+                element={
+                  <BlogGuard>
+                    <BlogPage />
+                  </BlogGuard>
+                } 
+              />
 
- <Route 
-    path="/products" 
-    element={
-      <ProductGuard>
-        <ProductsPage />
-      </ProductGuard>
-    } 
-  />
-  
-  <Route 
-    path="/blogs" 
-    element={
-      <BlogGuard>
-        <BlogPage />
-      </BlogGuard>
-    } 
-  />
-
-
-               <Route path="/blogandproductsapproval" element={<BlogAndProductsApprovalPage />} />
+              <Route path="/blogandproductsapproval" element={<BlogAndProductsApprovalPage />} />
               <Route path="/agentproducts" element={<AgentProductsPage />} />
-              {/* <Route path="/blogs" element={<BlogPage />} /> */}
               <Route path="/prodt" element={<ProductShowcases />} />
               <Route path="/blogshowcase" element={<BlogShowcases />} />
               <Route path="/users" element={<UsersPage />} />
             </Route>
 
 
- {/* ✅ Client Admin routes - specifically for client_admin role */}
-            <Route element={<RoleProtectedRoute requiredRole="client_admin" redirectTo="/home" />}>
+            {/* ============================================ */}
+            {/* CLIENT ADMIN ROUTES - for client_admin (merchants) */}
+            {/* ============================================ */}
+            <Route element={<RoleProtectedRoute requiredRole="client_admin" redirectTo="/" />}>
               {/* Subscription routes */}
               <Route path="/subscription/activation" element={<><Navbar /><MediaNavbar /><ActivationPayment /><Footer /></>} />
               <Route path="/subscription/plans" element={<><Navbar /><MediaNavbar /><SubscriptionPlans /><Footer /></>} />
@@ -176,15 +168,11 @@ function App() {
             </Route>
 
 
-
-
-
-
-
-            {/* ✅ Agent routes - for sales agents */}
-            <Route element={<RoleProtectedRoute requiredRole="agent" redirectTo="/home" />}>
+            {/* ============================================ */}
+            {/* AGENT ROUTES - for sales agents */}
+            {/* ============================================ */}
+            <Route element={<RoleProtectedRoute requiredRole="agent" redirectTo="/" />}>
               <Route path="/agent-dashboard" element={<div>Agent Dashboard</div>} />
-              {/* Add more agent routes here as you build them */}
             </Route>
 
             {/* Fallback route - redirect based on role */}

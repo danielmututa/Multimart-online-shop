@@ -116,13 +116,9 @@ export const DeleteProduct = async (id: string) : Promise<ProductSM>=> {
 
 export const AddReview = async (
   productId: string | number,
-  data: { user_id: number; rating: number; comment: string; username?: string }
+  data: { user_id?: number | null; rating: number; comment: string; username?: string }
 ): Promise<Review> => {
   try {
-    if (!data.user_id) {
-      throw new Error('User ID is required');
-    }
-    
     if (!data.comment?.trim()) {
       throw new Error('Comment is required');
     }
@@ -132,10 +128,10 @@ export const AddReview = async (
     }
 
     const response = await apiClient.post(`/api/products/${productId}/reviews`, {
-      user_id: data.user_id,
+      user_id: data.user_id || null, // Allow null for guests if backend supports it
       rating: data.rating,
       comment: data.comment.trim(),
-      username: data.username || "Anonymous" // ✅ Changed from user_name to username
+      username: data.username || "Anonymous"
     });
 
     return response.data;

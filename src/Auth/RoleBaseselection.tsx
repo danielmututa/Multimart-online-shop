@@ -12,9 +12,9 @@ export const RoleProtectedRoute = ({ requiredRole, redirectTo }: RoleProtectedRo
   const { user } = useAuthStore();
   const location = useLocation();
 
-  // If no user, redirect to login
+  // If no user, redirect to the specified public page (not login!)
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to={redirectTo} replace />;
   }
 
   // Map backend roles to frontend role system
@@ -42,7 +42,7 @@ export const RoleProtectedRoute = ({ requiredRole, redirectTo }: RoleProtectedRo
   // Special protection for /users route - only super_admin and digital_marketer_admin
   if (location.pathname === '/users') {
     if (user.role !== 'super_admin' && user.role !== 'digital_marketer_admin') {
-      return <Navigate to="/" replace />; // Redirect to admin dashboard
+      return <Navigate to="/admin-dashboard" replace />; // Redirect to admin dashboard
     }
   }
 

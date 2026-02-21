@@ -1,25 +1,22 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useNavigate } from "react-router-dom"
 import { useForm } from "react-hook-form"
 import { useAuthStore } from "@/context/userContext"
-import { useEffect, useState } from "react"
-import { GoogleSignIn}  from "./Googlesignin"
+import { useEffect } from "react"
 import { toast, Toaster } from "sonner"
 
 interface LoginInput {
-  username?: string
+  username: string
   email: string
-  phone?: string
+  phone: string
   password: string
 }
 
 const Login = () => {
   const navigate = useNavigate()
   const { login, user } = useAuthStore()
-  const [loginType, setLoginType] = useState<'admin' | 'client'>('client')
 
   const {
     register,
@@ -32,18 +29,14 @@ const Login = () => {
   }, [user])
 
   const handleSubmitForm = async (data: LoginInput) => {
-    console.log("Attempting login with:", data)
+    console.log("Attempting admin login with:", data)
     let loadingToastId: string | number | undefined
 
     try {
       loadingToastId = toast.loading("Logging you in...")
 
-      // Pass all data to login function
-      if (loginType === 'admin') {
-        await login(data.email, data.password, undefined, true, data.username, data.phone)
-      } else {
-        await login(data.email, data.password)
-      }
+      // Always send admin-style login
+      await login(data.email, data.password, undefined, true, data.username, data.phone)
 
       toast.dismiss(loadingToastId)
       toast.success("✅ Login successful!")
@@ -77,40 +70,24 @@ const Login = () => {
         <form onSubmit={handleSubmit(handleSubmitForm)} className="w-full md:w-[60%] xl:w-[40%] max-w-md">
           <Card className="w-full">
             <CardHeader>
-              <CardTitle>Welcome Back</CardTitle>
-              <CardDescription>Please login to continue</CardDescription>
+              <CardTitle>Admin Login</CardTitle>
+              <CardDescription>Login to access the admin dashboard</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
-              {/* Login Type Selection */}
+              {/* Username Field */}
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium">Login As</label>
-                <Select value={loginType} onValueChange={(value: 'admin' | 'client') => setLoginType(value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select login type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="client">Customer/Merchant</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
-                  </SelectContent>
-                </Select>
+                <label className="text-sm font-medium">Username</label>
+                <Input
+                  {...register("username", {
+                    required: "Username is required",
+                  })}
+                  placeholder="Enter your username"
+                  type="text"
+                />
+                {errors.username && <span className="text-red-500 text-xs">{errors.username.message}</span>}
               </div>
 
-              {/* Username Field - ONLY FOR ADMINS */}
-              {loginType === 'admin' && (
-                <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium">Username</label>
-                  <Input
-                    {...register("username", {
-                      required: loginType === 'admin' ? "Username is required" : false,
-                    })}
-                    placeholder="Enter your username"
-                    type="text"
-                  />
-                  {errors.username && <span className="text-red-500 text-xs">{errors.username.message}</span>}
-                </div>
-              )}
-
-              {/* Email Field - FOR BOTH */}
+              {/* Email Field */}
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium">Email</label>
                 <Input
@@ -127,26 +104,24 @@ const Login = () => {
                 {errors.email && <span className="text-red-500 text-xs">{errors.email.message}</span>}
               </div>
 
-              {/* Phone Number Field - ONLY FOR ADMINS */}
-              {loginType === 'admin' && (
-                <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium">Phone Number</label>
-                  <Input
-                    {...register("phone", {
-                      required: loginType === 'admin' ? "Phone number is required" : false,
-                      pattern: {
-                        value: /^(\+?263|0)?[1-9]\d{6,9}$/,
-                        message: "Please enter a valid phone number",
-                      },
-                    })}
-                    placeholder="+263771234567 or 0771234567"
-                    type="text"
-                  />
-                  {errors.phone && <span className="text-red-500 text-xs">{errors.phone.message}</span>}
-                </div>
-              )}
+              {/* Phone Number Field */}
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium">Phone Number</label>
+                <Input
+                  {...register("phone", {
+                    required: "Phone number is required",
+                    pattern: {
+                      value: /^(\+?263|0)?[1-9]\d{6,9}$/,
+                      message: "Please enter a valid phone number",
+                    },
+                  })}
+                  placeholder="+263771234567 or 0771234567"
+                  type="text"
+                />
+                {errors.phone && <span className="text-red-500 text-xs">{errors.phone.message}</span>}
+              </div>
 
-              {/* Password Field - FOR BOTH */}
+              {/* Password Field */}
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium">Password</label>
                 <Input
@@ -169,33 +144,12 @@ const Login = () => {
                 {isSubmitting ? "Logging in..." : "Login"}
               </Button>
               
-              {/* Only show Google Sign-In for clients */}
-              {loginType === 'client' && (
-                <>
-                  <div className="relative w-full">
-                    <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-background px-2 text-muted-foreground">
-                        Or continue with
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <GoogleSignIn disabled={isSubmitting} />
-                </>
-              )}
-              
-              {/* Only show register link for clients */}
-              {loginType === 'client' && (
-                <div className="w-full flex justify-between items-center">
-                  <p className="text-sm text-muted-foreground">Don't have an account?</p>
-                  <Button onClick={handleRegisterRedirect} variant="ghost" type="button" size="sm">
-                    Register
-                  </Button>
-                </div>
-              )}
+              <div className="w-full flex justify-between items-center">
+                <p className="text-sm text-muted-foreground">Need a merchant account?</p>
+                <Button onClick={handleRegisterRedirect} variant="ghost" type="button" size="sm">
+                  Register
+                </Button>
+              </div>
             </CardFooter>
           </Card>
         </form>

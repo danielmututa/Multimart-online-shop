@@ -3,21 +3,9 @@ export interface Category {
     name: string;
   }
   
-  // export interface Review {
-  //   id: number;
-  //   user_id: number;
-  //   product_id: number;
-  //   rating: number;
-  //   comment: string;
-  //   created_at: string;
-  // }
+  
 
-
-
-
-
-
-  export interface User {
+export interface User {
   id: number;
   username: string;
   email?: string; // Optional in some places
@@ -111,6 +99,26 @@ export interface ProductView {
   can_apply_as_agent?: boolean; // Helper flag
   }
   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

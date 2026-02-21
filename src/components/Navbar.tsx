@@ -28,8 +28,12 @@ const Navbar = () => {
       {/* <p className="text-white font-montserratBold text-xl">Dimbo P</p> */}
       {/* <p className="text-white font-montserratBold text-xl">Dimbo P</p> */}
 
- <NavLink to="/home">
+ <NavLink to="/">
      <img src={logo} className=' w-[9%] object-cover' alt="" />
+ </NavLink>
+
+ <NavLink to="/" className="text-white font-montserrat hover:font-montserratBold">
+   Home
  </NavLink>
 
       <div className="flex justify-between items-center gap-9" ref={dropdownRef}>
@@ -51,7 +55,6 @@ const Navbar = () => {
               <Link to="/contact" className="px-4 py-4 hover:bg-buttons font-montserrat cursor-pointer" onClick={handleMenuItemClick}>Contact us</Link>
               <Link to="/faq" className="px-4 py-4 hover:bg-buttons font-montserrat cursor-pointer" onClick={handleMenuItemClick}>FAQ</Link>
               <Link to="/whilelist" className="px-4 py-4 hover:bg-buttons font-montserrat cursor-pointer" onClick={handleMenuItemClick}>Wishlist</Link>
-              <Link to="/login" className="px-4 py-4 hover:bg-buttons font-montserrat cursor-pointer" onClick={handleMenuItemClick}>Login</Link>
             </div>
           </div>
         </div>
@@ -95,7 +98,8 @@ const Navbar = () => {
 
 
         <Account />
-        {/* <User size={18} className='text-white hover:text-buttons font-extrabold'/> */}
+        
+        {/* Login fallback if no user */}
         <Link to="/cart" className="flex items-center gap-2">
           <ShoppingCart size={18} className="text-white hover:text-buttons font-extrabold" />
           <span className="text-white text-sm font-montserrat">{cart?.length ?? 0}</span> {/* Safe access */}

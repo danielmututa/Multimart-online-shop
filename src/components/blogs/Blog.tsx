@@ -49,6 +49,7 @@ const Blog = () => {
     const images = [
     
       blog.image_url,
+      blog.hero_image,
       blog.blog_image_one,
       blog.blog_image_two,
       blog.blog_image_three,

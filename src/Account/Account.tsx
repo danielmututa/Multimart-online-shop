@@ -97,11 +97,17 @@ const Account = () => {
     }
   };
 
-  // Guard against missing user
+  // Guard against missing user - Render Login button instead of redirecting
   if (!user) {
-    console.log("No user found, redirecting to login");
-    navigate("/login");
-    return null;
+    return (
+      <Button 
+        variant="outline" 
+        className="bg-transparent border-white text-white hover:bg-white hover:text-navbar"
+        onClick={() => navigate("/login")}
+      >
+        Login
+      </Button>
+    );
   }
 
   return (

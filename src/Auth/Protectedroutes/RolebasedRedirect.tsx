@@ -6,7 +6,7 @@ const RoleBasedRedirect = () => {
   const { user } = useAuthStore();
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />; // Public homepage, no login required
   }
 
   // Check admin roles
@@ -18,11 +18,11 @@ const RoleBasedRedirect = () => {
   const isAgent = user.role === 'agent';
 
   if (isAdmin) {
-    return <Navigate to="/" replace />; // Admin dashboard
+    return <Navigate to="/admin-dashboard" replace />; // Admin dashboard
   } else if (isAgent) {
     return <Navigate to="/agent-dashboard" replace />; // Agent dashboard
   } else {
-    return <Navigate to="/home" replace />; // User home page
+    return <Navigate to="/" replace />; // User home page
   }
 };
 

@@ -14,11 +14,15 @@ export const AuthRoute = () => {
   if (user) {
     // Admin roles go to admin dashboard
     if (user.role === 'super_admin' || user.role === 'digital_marketer_admin' || user.role === 'client_admin') {
-      return <Navigate to="/" replace />;
+      return <Navigate to="/admin-dashboard" replace />;
     } 
-    // Regular users go to home page
+    // Agents go to agent dashboard
+    else if (user.role === 'agent') {
+      return <Navigate to="/agent-dashboard" replace />;
+    }
+    // Regular users go to home page (root)
     else if (user.role === 'client') {
-      return <Navigate to="/home" replace />;
+      return <Navigate to="/" replace />;
     }
   }
 

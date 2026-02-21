@@ -23,7 +23,7 @@ const MobileNavbar: React.FC = () => {
         {/* Top Bar */}
         <div className="flex justify-between items-center h-16">
           {/* <p className="text-white font-montserratBold text-xl">Dimbo P</p> */}
-          <NavLink to="/home">
+          <NavLink to="/">
                <img src={logo} className=' w-[9%] object-cover' alt="" />
            </NavLink>
           
@@ -46,7 +46,7 @@ const MobileNavbar: React.FC = () => {
           <div className="px-4 py-4 space-y-4">
             {/* Home Link */}
             <NavLink 
-              to="/home" 
+              to="/" 
               className="block text-white font-montserrat py-2"
               onClick={() => setIsMenuOpen(false)}
             >
@@ -70,7 +70,6 @@ const MobileNavbar: React.FC = () => {
                   <Link to="/contact" className="block text-gray-300 hover:text-white" onClick={() => setIsMenuOpen(false)}>Contact us</Link>
                   <Link to="/faq" className="block text-gray-300 hover:text-white" onClick={() => setIsMenuOpen(false)}>FAQ</Link>
                   <Link to="/whilelist" className="block text-gray-300 hover:text-white" onClick={() => setIsMenuOpen(false)}>Wishlist</Link>
-                  <Link to="/login" className="block text-gray-300 hover:text-white" onClick={() => setIsMenuOpen(false)}>Login</Link>
                 </div>
               </div>
             </div>
@@ -109,6 +108,14 @@ const MobileNavbar: React.FC = () => {
                 </div>
               </div>
             </div>
+
+            <NavLink 
+              to="/login" 
+              className="block text-white font-montserratBold py-2 border-t border-gray-700 mt-2"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Login / Register
+            </NavLink>
 
             <div className="flex justify-between items-center gap-8">
        

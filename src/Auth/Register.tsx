@@ -27,7 +27,7 @@ interface RegisterFormData {
 }
 
 interface RegisterProps {
-  role?: 'client' | 'client_admin' | 'agent';
+  role?: 'client_admin' | 'agent';
 }
 
 const Register = ({ role }: RegisterProps = {}) => {
@@ -36,8 +36,10 @@ const Register = ({ role }: RegisterProps = {}) => {
   
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  // Initialize with the prop value if provided, otherwise default to 'client'
-  const [registerType, setRegisterType] = useState<'client' | 'client_admin' | 'agent'>(role || 'client')
+  // Default to client_admin, no more 'client' option
+  const [registerType, setRegisterType] = useState<'client_admin' | 'agent'>(
+    role === 'agent' ? 'agent' : 'client_admin'
+  )
   const [gettingLocation, setGettingLocation] = useState(false)
 
   const {
@@ -55,7 +57,7 @@ const Register = ({ role }: RegisterProps = {}) => {
   // Update registerType when role prop changes
   useEffect(() => {
     if (role) {
-      setRegisterType(role)
+      setRegisterType(role === 'agent' ? 'agent' : 'client_admin')
     }
   }, [role])
 
@@ -178,7 +180,7 @@ const Register = ({ role }: RegisterProps = {}) => {
           <Card className="w-full">
             <CardHeader>
               <CardTitle>Create Account</CardTitle>
-              <CardDescription>Register as a customer, merchant, or agent</CardDescription>
+              <CardDescription>Register as a merchant or agent</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
               {/* Registration Type Selection */}
@@ -186,14 +188,13 @@ const Register = ({ role }: RegisterProps = {}) => {
                 <label className="text-sm font-medium">Register As</label>
                 <Select 
                   value={registerType} 
-                  onValueChange={(value: 'client' | 'client_admin' | 'agent') => setRegisterType(value)}
+                  onValueChange={(value: 'client_admin' | 'agent') => setRegisterType(value)}
                   disabled={!!role} // Disable if role is provided via prop
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select account type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="client">Client (Customer)</SelectItem>
                     <SelectItem value="client_admin">Client Admin (Merchant)</SelectItem>
                     <SelectItem value="agent">Agent (Sales Representative)</SelectItem>
                   </SelectContent>
@@ -532,7 +533,6 @@ const Register = ({ role }: RegisterProps = {}) => {
             <CardFooter className="flex flex-col gap-4">
               <Button type="submit" disabled={isSubmitting} className="w-full">
                 {isSubmitting ? "Registering..." : `Register as ${
-                  registerType === 'client' ? 'Client' : 
                   registerType === 'client_admin' ? 'Merchant' : 'Agent'
                 }`}
               </Button>
