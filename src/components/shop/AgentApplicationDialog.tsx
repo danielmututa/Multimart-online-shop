@@ -26,29 +26,31 @@ const AgentApplicationDialog: React.FC<AgentApplicationDialogProps> = ({
   const [success, setSuccess] = useState(false);
   const [warning, setWarning] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState<{
-    fullName: string;
-    nationalId: string;
-    payoutMethod: PayoutMethod;
-    payoutNumber: string;
-    bankName: string;
-    bankAccountNumber: string;
-    bankAccountName: string;
-    reason: string;
-    acceptedTerms: boolean;
-  }>({
-    fullName: '',
-    nationalId: '',
-    payoutMethod: 'ecocash',
-    payoutNumber: '',
-    bankName: '',
-    bankAccountNumber: '',
-    bankAccountName: '',
-    reason: '',
-    email: '',
-    phone: '',
-    acceptedTerms: false,
-  });
+ const [formData, setFormData] = useState<{
+  fullName: string;
+  nationalId: string;
+  email: string;          // <-- added
+  phone: string;          // <-- added
+  payoutMethod: PayoutMethod;
+  payoutNumber: string;
+  bankName: string;
+  bankAccountNumber: string;
+  bankAccountName: string;
+  reason: string;
+  acceptedTerms: boolean;
+}>({
+  fullName: '',
+  nationalId: '',
+  email: '',              // <-- initialize
+  phone: '',              // <-- initialize
+  payoutMethod: 'ecocash',
+  payoutNumber: '',
+  bankName: '',
+  bankAccountNumber: '',
+  bankAccountName: '',
+  reason: '',
+  acceptedTerms: false,
+});
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
