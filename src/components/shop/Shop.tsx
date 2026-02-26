@@ -491,14 +491,14 @@ const Shop: React.FC = () => {
 
         {/* Categories Filter */}
         <div>
-          <h3 className='text-lg font-montserratBold mb-4 text-gray-800 border-b border-gray-100 pb-2'>Categories</h3>
+          <h3 className='text-lg font-montserratBold mb-4 text-gray-800 dark:text-white border-b border-gray-100 dark:border-slate-800 pb-2'>Categories</h3>
           <div className="mb-4 relative">
              <input 
                type="text" 
                placeholder="Search categories..." 
                value={categorySearch}
                onChange={(e) => setCategorySearch(e.target.value)}
-               className="w-full text-xs p-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-buttons"
+               className="w-full text-xs p-2 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg outline-none focus:border-buttons dark:text-white"
              />
           </div>
           <ul className="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
@@ -506,7 +506,7 @@ const Shop: React.FC = () => {
               className={`cursor-pointer p-2 rounded-lg transition-all duration-200 ${
                 selectedCategory === null
                   ? "bg-buttons text-white shadow-md font-semibold"
-                  : "text-gray-600 hover:bg-gray-100 hover:text-buttons"
+                  : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-buttons"
               }`}
               onClick={() => { setSelectedCategory(null); setCurrentPage(1); }}
             >
@@ -520,7 +520,7 @@ const Shop: React.FC = () => {
                 className={`cursor-pointer p-2 rounded-lg transition-all duration-200 flex items-center gap-2 ${
                   selectedCategory === category.name
                     ? "bg-buttons text-white shadow-md font-semibold"
-                    : "text-gray-600 hover:bg-gray-100 hover:text-buttons"
+                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-buttons"
                 }`}
                 onClick={() => { setSelectedCategory(category.name); setCurrentPage(1); }}
               >
@@ -532,10 +532,10 @@ const Shop: React.FC = () => {
 
         {/* Price Range Filter */}
         <div>
-          <h3 className='text-lg font-montserratBold mb-4 text-gray-800 border-b border-gray-100 pb-2'>Price Range</h3>
+          <h3 className='text-lg font-montserratBold mb-4 text-gray-800 dark:text-white border-b border-gray-100 dark:border-slate-800 pb-2'>Price Range</h3>
           <div className="space-y-6">
             <div className="flex flex-col space-y-3">
-              <div className="flex justify-between text-xs font-bold text-gray-500 uppercase">
+              <div className="flex justify-between text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">
                 <span>Min</span>
                 <span>${priceRange.min}</span>
               </div>
@@ -549,7 +549,7 @@ const Shop: React.FC = () => {
               />
             </div>
             <div className="flex flex-col space-y-3">
-              <div className="flex justify-between text-xs font-bold text-gray-500 uppercase">
+              <div className="flex justify-between text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">
                 <span>Max</span>
                 <span>${priceRange.max}</span>
               </div>
@@ -567,14 +567,14 @@ const Shop: React.FC = () => {
 
         {/* Brand Filter */}
         <div>
-          <h3 className='text-lg font-montserratBold mb-4 text-gray-800 border-b border-gray-100 pb-2'>Brands</h3>
+          <h3 className='text-lg font-montserratBold mb-4 text-gray-800 dark:text-white border-b border-gray-100 dark:border-slate-800 pb-2'>Brands</h3>
           <div className="mb-4 relative">
              <input 
                type="text" 
                placeholder="Search brands..." 
                value={brandSearch}
                onChange={(e) => setBrandSearch(e.target.value)}
-               className="w-full text-xs p-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-buttons"
+               className="w-full text-xs p-2 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg outline-none focus:border-buttons dark:text-white"
              />
           </div>
           <ul className="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
@@ -582,7 +582,7 @@ const Shop: React.FC = () => {
               className={`cursor-pointer p-2 rounded-lg transition-all duration-200 ${
                 selectedBrand === null
                   ? "bg-buttons text-white shadow-md font-semibold"
-                  : "text-gray-600 hover:bg-gray-100 hover:text-buttons"
+                  : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-buttons"
               }`}
               onClick={() => { setSelectedBrand(null); setCurrentPage(1); }}
             >
@@ -597,7 +597,7 @@ const Shop: React.FC = () => {
                 className={`cursor-pointer p-2 rounded-lg transition-all duration-200 ${
                   selectedBrand === brand
                     ? "bg-buttons text-white shadow-md font-semibold"
-                    : "text-gray-600 hover:bg-gray-100 hover:text-buttons"
+                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-buttons"
                 }`}
                 onClick={() => { setSelectedBrand(brand); setCurrentPage(1); }}
               >
@@ -703,14 +703,14 @@ const Shop: React.FC = () => {
                     <button
                       onClick={(e) => handleAddToWishlist(card, e)}
                       className={`p-2 rounded-full shadow-md hover:scale-110 transition-transform ${
-                        isInWishlist ? 'bg-red-500 text-white' : 'bg-white hover:text-buttons'
+                        isInWishlist ? 'bg-red-500 text-white' : 'bg-white dark:bg-slate-800 dark:text-white hover:text-buttons'
                       }`}
                     >
                       <Heart size={16} fill={isInWishlist ? 'currentColor' : 'none'} />
                     </button>
                     <button
                       onClick={() => openDialog(card)}
-                      className="p-2 bg-white rounded-full shadow-md hover:scale-110 transition-transform hover:text-buttons"
+                      className="p-2 bg-white dark:bg-slate-800 dark:text-white rounded-full shadow-md hover:scale-110 transition-transform hover:text-buttons"
                     >
                       <Plus size={16} />
                     </button>
@@ -718,9 +718,9 @@ const Shop: React.FC = () => {
                       onClick={(e) => handleAddToCart(card, e)}
                       disabled={!inStock || isAddingThis}
                       className={`p-2 rounded-full shadow-md hover:scale-110 transition-transform ${
-                        !inStock ? 'bg-gray-300 cursor-not-allowed' : 
+                        !inStock ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed' : 
                         isAddingThis ? 'bg-blue-500 text-white cursor-wait' : 
-                        'bg-white hover:text-buttons'
+                        'bg-white dark:bg-slate-800 dark:text-white hover:text-buttons'
                       }`}
                     >
                       {isAddingThis ? (
@@ -732,18 +732,18 @@ const Shop: React.FC = () => {
                    </div>
                 </div>
 
-                <p className="text-sm lg:text-[15px] font-montserrat pt-[10px] text-gray-600">
+                <p className="text-sm lg:text-[15px] font-montserrat pt-[10px] text-gray-600 dark:text-gray-400">
                   {getProductCategoryName(card)}
                 </p>
-                <p className="text-[16px] font-montserratBold pt-[14px] leading-[1.1] lg:text-[18px] group-hover:text-buttons transition-colors duration-500">
+                <p className="text-[16px] font-montserratBold pt-[14px] leading-[1.1] lg:text-[18px] text-gray-800 dark:text-white group-hover:text-buttons transition-colors duration-500">
                   {card.name}
                 </p>
                 <div className="flex items-center justify-between pt-2">
                   <div className="flex flex-col">
-                    <p className="text-sm font-montserrat text-gray-600 text-[16px]">
+                    <p className="text-sm font-montserrat text-gray-600 dark:text-gray-300 text-[16px]">
                       ${parseFloat(card.price).toFixed(2)}
                       {card.discount_percentage && card.discount_percentage > 0 && (
-                        <span className="text-[#6600EE] ml-2">-{card.discount_percentage}%</span>
+                        <span className="text-[#6600EE] dark:text-violet-400 ml-2">-{card.discount_percentage}%</span>
                       )}
                     </p>
                   </div>
@@ -811,30 +811,30 @@ const Shop: React.FC = () => {
       {/* Enhanced Product Detail Dialog - Same as NewProducts */}
       {isDialogOpen && selectedProduct && (
         <div
-          className="fixed inset-0 backdrop-blur-md bg-black/40 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 backdrop-blur-md bg-black/30 flex items-center justify-center z-50 p-4"
           onClick={closeDialog}
         >
           <div
-            className="bg-white/95 backdrop-blur-xl rounded-3xl w-full max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-4xl xl:max-w-5xl max-h-[95vh] overflow-y-auto mx-4 shadow-2xl border border-white/20"
+            className="bg-white dark:bg-slate-900 rounded-lg w-full max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-4xl xl:max-w-5xl max-h-[90vh] overflow-y-auto mx-4 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex flex-col lg:flex-row">
               <div className="flex-1 p-6 lg:p-8 overflow-y-auto">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-2">
-                    <h3 className="text-lg lg:text-xl font-montserratBold text-gray-800">More about the product</h3>
-                    <ChevronRight size={20} className="text-gray-600" />
+                    <h3 className="text-lg lg:text-xl font-montserratBold text-gray-800 dark:text-white">More about the product</h3>
+                    <ChevronRight size={20} className="text-gray-600 dark:text-gray-400" />
                   </div>
-                  <button onClick={closeDialog} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                    <X size={20} />
+                  <button onClick={closeDialog} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+                    <X size={20} className="dark:text-white" />
                   </button>
                 </div>
 
                 <div className="space-y-4">
-                  <p className="text-sm lg:text-base font-montserrat text-gray-600">
+                  <p className="text-sm lg:text-base font-montserrat text-gray-600 dark:text-gray-400">
                     {getProductCategoryName(selectedProduct)}
                   </p>
-                  <h4 className="text-xl lg:text-2xl font-montserratBold text-gray-800">{selectedProduct.name}</h4>
+                  <h4 className="text-xl lg:text-2xl font-montserratBold text-gray-800 dark:text-white">{selectedProduct.name}</h4>
 
                   <div className="flex items-center gap-4 flex-wrap">
                     {/* Rating */}
@@ -842,31 +842,31 @@ const Shop: React.FC = () => {
                       <div className="flex items-center gap-1">
                         {renderStars(selectedProduct.rating ?? 0, selectedProduct.id)}
                       </div>
-                      <span className="text-sm text-gray-600">({selectedProduct.rating?.toFixed(1) ?? "0.0"}/5)</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">({selectedProduct.rating?.toFixed(1) ?? "0.0"}/5)</span>
                     </div>
 
                     {/* Views */}
-                    <div className="flex items-center gap-1 text-sm text-gray-600">
+                    <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
                       <span>•</span>
                       <span>{selectedProduct.views ?? 0} views</span>
                     </div>
 
                     {/* Reviews */}
-                    <div className="flex items-center gap-1 text-sm text-gray-600">
+                    <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
                       <span>•</span>
                       <span>{selectedProduct.reviews?.length ?? 0} reviews</span>
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <h5 className="font-montserratBold text-gray-800">Description</h5>
-                    <p className="text-sm lg:text-base text-gray-600 leading-relaxed">
+                    <h5 className="font-montserratBold text-gray-800 dark:text-white">Description</h5>
+                    <p className="text-sm lg:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
                       {selectedProduct.description ||
                         "Experience cutting-edge technology with this premium smartphone. Featuring advanced camera capabilities, lightning-fast performance, and sleek design that fits perfectly in your hand."}
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <h5 className="font-montserratBold text-gray-800">Stock</h5>
+                    <h5 className="font-montserratBold text-gray-800 dark:text-white">Stock</h5>
                     <p className={`text-sm ${selectedProduct.stock_quantity > 0 ? "text-green-600" : "text-red-600"}`}>
                       {selectedProduct.stock_quantity > 0
                         ? `${selectedProduct.stock_quantity} items available`
@@ -875,16 +875,16 @@ const Shop: React.FC = () => {
                   </div>
                   <div className="flex items-center justify-between pt-4">
                     <div className="flex items-center gap-4">
-                      <span className="font-montserratBold text-gray-800">Quantity:</span>
-                      <div className="flex items-center border rounded-lg border-gray-200">
-                        <button onClick={decrementQuantity} className="p-3 hover:bg-gray-100 transition-colors">
-                          <Minus size={16} />
+                      <span className="font-montserratBold text-gray-800 dark:text-white">Quantity:</span>
+                      <div className="flex items-center border rounded-lg border-gray-200 dark:border-slate-700">
+                        <button onClick={decrementQuantity} className="p-3 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
+                          <Minus size={16} className="dark:text-white" />
                         </button>
-                        <span className="px-4 py-2 border-x border-gray-200 min-w-[50px] text-center text-sm">
+                        <span className="px-4 py-2 border-x border-gray-200 dark:border-slate-700 min-w-[50px] text-center text-sm dark:text-white">
                           {quantity}
                         </span>
-                        <button onClick={incrementQuantity} className="p-3 hover:bg-gray-100 transition-colors">
-                          <Plus size={16} />
+                        <button onClick={incrementQuantity} className="p-3 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
+                          <Plus size={16} className="dark:text-white" />
                         </button>
                       </div>
                     </div>
@@ -901,7 +901,13 @@ const Shop: React.FC = () => {
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-3 pt-6">
-                    {(() => {
+                   
+
+                    <div className="border-t pt-6 mt-6 flex justify-between w-full flex-col ">
+
+
+
+ {(() => {
                       const contactPhone = selectedProduct?.whatsapp_number || selectedProduct?.client_admin?.phone;
                       
                       return contactPhone ? (
@@ -917,7 +923,10 @@ const Shop: React.FC = () => {
                       ) : null;
                     })()}
 
-                    <div className="border-t pt-6 mt-6 flex justify-between w-full flex-col ">
+
+
+
+
                       <div className="flex justify-between gap-8 w-full pb-6">
                         <button
                           onClick={handleAddToCartFromDialog}

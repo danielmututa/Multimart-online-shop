@@ -65,12 +65,12 @@ const MobileNavbar: React.FC = () => {
               </button>
               <div className={`overflow-hidden transition-all duration-300 ${openAccordion === 'pages' ? 'max-h-96' : 'max-h-0'}`}>
                 <div className="pl-4 pt-2 space-y-3">
-                  <Link to="/about" className="block text-gray-300 hover:text-white" onClick={() => setIsMenuOpen(false)}>About us</Link>
-                  <Link to="/team" className="block text-gray-300 hover:text-white" onClick={() => setIsMenuOpen(false)}>About Team</Link>
-                  <Link to="/services" className="block text-gray-300 hover:text-white" onClick={() => setIsMenuOpen(false)}>Services</Link>
-                  <Link to="/contact" className="block text-gray-300 hover:text-white" onClick={() => setIsMenuOpen(false)}>Contact us</Link>
-                  <Link to="/faq" className="block text-gray-300 hover:text-white" onClick={() => setIsMenuOpen(false)}>FAQ</Link>
-                  <Link to="/whilelist" className="block text-gray-300 hover:text-white" onClick={() => setIsMenuOpen(false)}>Wishlist</Link>
+                  <Link to="/about" className="block text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>About us</Link>
+                  <Link to="/team" className="block text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>About Team</Link>
+                  <Link to="/services" className="block text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Services</Link>
+                  <Link to="/contact" className="block text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Contact us</Link>
+                  <Link to="/faq" className="block text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>FAQ</Link>
+                  <Link to="/whilelist" className="block text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Wishlist</Link>
                 </div>
               </div>
             </div>
@@ -86,9 +86,9 @@ const MobileNavbar: React.FC = () => {
               </button>
               <div className={`overflow-hidden transition-all duration-300 ${openAccordion === 'shop' ? 'max-h-96' : 'max-h-0'}`}>
                 <div className="pl-4 pt-2 space-y-3">
-                  <Link to="/shop" className="block text-gray-300 hover:text-white" onClick={() => setIsMenuOpen(false)}>Product Listings</Link>
-                  <Link to="/categories" className="block text-gray-300 hover:text-white" onClick={() => setIsMenuOpen(false)}>Categories</Link>
-                  <Link to="/account" className="block text-gray-300 hover:text-white" onClick={() => setIsMenuOpen(false)}>Account</Link>
+                  <Link to="/shop" className="block text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Product Listings</Link>
+                  <Link to="/categories" className="block text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Categories</Link>
+                  <Link to="/account" className="block text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Account</Link>
                 </div>
               </div>
             </div>
@@ -104,8 +104,8 @@ const MobileNavbar: React.FC = () => {
               </button>
               <div className={`overflow-hidden transition-all duration-300 ${openAccordion === 'blogs' ? 'max-h-96' : 'max-h-0'}`}>
                 <div className="pl-4 pt-2 space-y-3">
-                  <Link to="/blog" className="block text-gray-300 hover:text-white" onClick={() => setIsMenuOpen(false)}>Blog</Link>
-                  <Link to="/blogarticle" className="block text-gray-300 hover:text-white" onClick={() => setIsMenuOpen(false)}>Blog Article</Link>
+                  <Link to="/blog" className="block text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Blog</Link>
+                  <Link to="/blogarticle" className="block text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Blog Article</Link>
                 </div>
               </div>
             </div>

@@ -122,28 +122,28 @@ const Account = () => {
         <SheetContent>
           <SheetHeader className="flex mt-10 w-full flex-col items-center">
             <SheetTitle className="flex w-full flex-col items-center">
-              <FaUserCircle className="h-[40px] w-[40px]" />
-              <p className="text-sm md:text-lg">{user.username || user.email?.split('@')[0] || "User Name"}</p>
-              <p className="text-sm md:text-[16px] font-light">{user.email || "user@example.com"}</p>
+              <FaUserCircle className="h-[40px] w-[40px] dark:text-white" />
+              <p className="text-sm md:text-lg dark:text-white">{user.username || user.email?.split('@')[0] || "User Name"}</p>
+              <p className="text-sm md:text-[16px] font-light dark:text-gray-300">{user.email || "user@example.com"}</p>
             </SheetTitle>
 
             <SheetDescription asChild>
               <div className="flex pt-3 justify-between w-full">
-                <span className="text-sm md:text-[16px]">Role</span>
-                <span className="text-sm md:text-[16px]">{user.role || "Admin"}</span>
+                <span className="text-sm md:text-[16px] dark:text-gray-400">Role</span>
+                <span className="text-sm md:text-[16px] dark:text-white">{user.role || "Admin"}</span>
               </div>
             </SheetDescription>
 
               
             <SheetDescription asChild>
               <div className="flex pt-3 justify-between w-full">
-                <span className="text-sm md:text-[16px]">Phone</span>
-                <span className="text-sm md:text-[16px]">{user.phone || "Not provided"}</span>
+                <span className="text-sm md:text-[16px] dark:text-gray-400">Phone</span>
+                <span className="text-sm md:text-[16px] dark:text-white">{user.phone || "Not provided"}</span>
               </div>
             </SheetDescription>
 
 
-            <div className="w-full border"></div>
+            <div className="w-full border dark:border-slate-800"></div>
 
             <form className="pt-2 w-full">
               {/* Change Password Accordion */}

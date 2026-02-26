@@ -466,14 +466,14 @@ const openDialog = async (product: Product) => {
                   <button
                     onClick={(e) => toggleWishlist(product, e)}
                     className={`p-2 rounded-full shadow-md hover:scale-110 transition-transform ${
-                      isInWishlist ? "bg-red-500 text-white" : "bg-white hover:text-buttons"
+                      isInWishlist ? "bg-red-500 text-white" : "bg-white dark:bg-slate-800 dark:text-white hover:text-buttons"
                     }`}
                   >
                     <Heart size={16} fill={isInWishlist ? "currentColor" : "none"} />
                   </button>
                   <button
                     onClick={() => openDialog(product)}
-                    className="p-2 bg-white rounded-full shadow-md hover:scale-110 transition-transform hover:text-buttons"
+                    className="p-2 bg-white dark:bg-slate-800 dark:text-white rounded-full shadow-md hover:scale-110 transition-transform hover:text-buttons"
                   >
                     <Plus size={16} />
                   </button>
@@ -482,10 +482,10 @@ const openDialog = async (product: Product) => {
                     disabled={!inStock || isAddingThis}
                     className={`p-2 rounded-full shadow-md hover:scale-110 transition-transform ${
                       !inStock
-                        ? "bg-gray-300 cursor-not-allowed"
+                        ? "bg-gray-300 dark:bg-gray-700 cursor-not-allowed"
                         : isAddingThis
                           ? "bg-blue-500 text-white cursor-wait"
-                          : "bg-white hover:text-buttons"
+                          : "bg-white dark:bg-slate-800 dark:text-white hover:text-buttons"
                     }`}
                     title={!inStock ? "Out of stock" : `Add to cart (${product.stock_quantity} available)`}
                   >
@@ -498,18 +498,18 @@ const openDialog = async (product: Product) => {
                 </div>
               </div>
 
-              <p className="text-sm lg:text-[15px] font-montserrat pt-[10px] text-gray-600">
+              <p className="text-sm lg:text-[15px] font-montserrat pt-[10px] text-gray-600 dark:text-gray-400">
                 {getProductCategoryName(product)}
               </p>
-              <p className="text-[16px] font-montserratBold pt-[14px] leading-[1.1] lg:text-[18px] group-hover:text-buttons transition-colors duration-500">
+              <p className="text-[16px] font-montserratBold pt-[14px] leading-[1.1] lg:text-[18px] text-gray-800 dark:text-white group-hover:text-buttons transition-colors duration-500">
                 {product.name}
               </p>
               <div className="flex items-center justify-between pt-2">
                 <div className="flex flex-col">
-                  <p className="text-sm font-montserrat text-gray-600 text-[16px]">
+                  <p className="text-sm font-montserrat text-gray-600 dark:text-gray-300 text-[16px]">
                     ${Number.parseFloat(product.price).toFixed(2)}
                     {product.discount_percentage && product.discount_percentage > 0 && (
-                      <span className="text-[#6600EE] ml-2">-{product.discount_percentage}%</span>
+                      <span className="text-[#6600EE] dark:text-violet-400 ml-2">-{product.discount_percentage}%</span>
                     )}
                   </p>
                 </div>
@@ -539,53 +539,53 @@ const openDialog = async (product: Product) => {
           onClick={closeDialog}
         >
           <div
-            className="bg-white rounded-lg w-full max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-4xl xl:max-w-5xl max-h-[90vh] overflow-y-auto mx-4"
+            className="bg-white dark:bg-slate-900 rounded-lg w-full max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-4xl xl:max-w-5xl max-h-[90vh] overflow-y-auto mx-4 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex flex-col lg:flex-row">
               <div className="flex-1 p-6 lg:p-8 overflow-y-auto">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-2">
-                    <h3 className="text-lg lg:text-xl font-montserratBold text-gray-800">More about the product</h3>
-                    <ChevronRight size={20} className="text-gray-600" />
+                    <h3 className="text-lg lg:text-xl font-montserratBold text-gray-800 dark:text-white">More about the product</h3>
+                    <ChevronRight size={20} className="text-gray-600 dark:text-gray-400" />
                   </div>
-                  <button onClick={closeDialog} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                    <X size={20} />
+                  <button onClick={closeDialog} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+                    <X size={20} className="dark:text-white" />
                   </button>
                 </div>
 
                 <div className="space-y-4">
-                  <p className="text-sm lg:text-base font-montserrat text-gray-600">
+                  <p className="text-sm lg:text-base font-montserrat text-gray-600 dark:text-gray-400">
                     {getProductCategoryName(selectedProduct)}
                   </p>
-                  <h4 className="text-xl lg:text-2xl font-montserratBold text-gray-800">{selectedProduct.name}</h4>
+                  <h4 className="text-xl lg:text-2xl font-montserratBold text-gray-800 dark:text-white">{selectedProduct.name}</h4>
 
                   <div className="flex items-center gap-4 flex-wrap">
                     <div className="flex items-center gap-2">
                       <div className="flex items-center gap-1">
                         {renderStars(selectedProduct.rating ?? 0, selectedProduct.id)}
                       </div>
-                      <span className="text-sm text-gray-600">({selectedProduct.rating?.toFixed(1) ?? "0.0"}/5)</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">({selectedProduct.rating?.toFixed(1) ?? "0.0"}/5)</span>
                     </div>
-                    <div className="flex items-center gap-1 text-sm text-gray-600">
+                    <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
                       <span>•</span>
                       <span>{selectedProduct.views ?? 0} views</span>
                     </div>
-                    <div className="flex items-center gap-1 text-sm text-gray-600">
+                    <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
                       <span>•</span>
                       <span>{selectedProduct.reviews?.length ?? 0} reviews</span>
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <h5 className="font-montserratBold text-gray-800">Description</h5>
-                    <p className="text-sm lg:text-base text-gray-600 leading-relaxed">
+                    <h5 className="font-montserratBold text-gray-800 dark:text-white">Description</h5>
+                    <p className="text-sm lg:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
                       {selectedProduct.description ||
                         "Experience cutting-edge technology with this premium smartphone. Featuring advanced camera capabilities, lightning-fast performance, and sleek design that fits perfectly in your hand."}
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <h5 className="font-montserratBold text-gray-800">Stock</h5>
+                    <h5 className="font-montserratBold text-gray-800 dark:text-white">Stock</h5>
                     <p className={`text-sm ${selectedProduct.stock_quantity > 0 ? "text-green-600" : "text-red-600"}`}>
                       {selectedProduct.stock_quantity > 0
                         ? `${selectedProduct.stock_quantity} items available`
@@ -594,16 +594,16 @@ const openDialog = async (product: Product) => {
                   </div>
                   <div className="flex items-center justify-between pt-4">
                     <div className="flex items-center gap-4">
-                      <span className="font-montserratBold text-gray-800">Quantity:</span>
-                      <div className="flex items-center border rounded-lg border-gray-200">
-                        <button onClick={decrementQuantity} className="p-3 hover:bg-gray-100 transition-colors">
-                          <Minus size={16} />
+                      <span className="font-montserratBold text-gray-800 dark:text-white">Quantity:</span>
+                      <div className="flex items-center border rounded-lg border-gray-200 dark:border-slate-700">
+                        <button onClick={decrementQuantity} className="p-3 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
+                          <Minus size={16} className="dark:text-white" />
                         </button>
-                        <span className="px-4 py-2 border-x border-gray-200 min-w-[50px] text-center text-sm">
+                        <span className="px-4 py-2 border-x border-gray-200 dark:border-slate-700 min-w-[50px] text-center text-sm dark:text-white">
                           {quantity}
                         </span>
-                        <button onClick={incrementQuantity} className="p-3 hover:bg-gray-100 transition-colors">
-                          <Plus size={16} />
+                        <button onClick={incrementQuantity} className="p-3 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
+                          <Plus size={16} className="dark:text-white" />
                         </button>
                       </div>
                     </div>

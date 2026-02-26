@@ -46,18 +46,18 @@ const Navbar = () => {
 
         {/* Pages dropdown */}
         <div className="relative" onMouseEnter={() => setOpenMenu('pages')}>
-          <button className="flex gap-1 items-center font-montserrat text-white hover:font-montserratBold">
+          <button className="flex gap-1 items-center font-montserrat text-white hover:font-montserratBold transition-all">
             Pages
             <ChevronDown size={14} className={`text-white transition-transform duration-300 ${openMenu === 'pages' ? 'rotate-180' : ''}`} />
           </button>
-          <div className={`absolute left-0 mt-[18px] flex-col w-48 bg-white border rounded shadow-lg z-10 transition-all duration-300 origin-top ${openMenu === 'pages' ? 'opacity-100 transform scale-y-100' : 'opacity-0 transform scale-y-0'}`}>
+          <div className={`absolute left-0 mt-[18px] flex-col w-48 bg-white dark:bg-slate-900 border dark:border-slate-800 rounded shadow-lg z-10 transition-all duration-300 origin-top ${openMenu === 'pages' ? 'opacity-100 transform scale-y-100' : 'opacity-0 transform scale-y-0'}`}>
             <div className="w-full flex flex-col">
-              <Link to="/about" className="px-4 py-4 hover:bg-buttons font-montserrat cursor-pointer" onClick={handleMenuItemClick}>About us</Link>
-              <Link to="/team" className="px-4 py-4 hover:bg-buttons font-montserrat cursor-pointer" onClick={handleMenuItemClick}>About Team</Link>
-              <Link to="/services" className="px-4 py-4 hover:bg-buttons font-montserrat cursor-pointer" onClick={handleMenuItemClick}>Services</Link>
-              <Link to="/contact" className="px-4 py-4 hover:bg-buttons font-montserrat cursor-pointer" onClick={handleMenuItemClick}>Contact us</Link>
-              <Link to="/faq" className="px-4 py-4 hover:bg-buttons font-montserrat cursor-pointer" onClick={handleMenuItemClick}>FAQ</Link>
-              <Link to="/whilelist" className="px-4 py-4 hover:bg-buttons font-montserrat cursor-pointer" onClick={handleMenuItemClick}>Wishlist</Link>
+              <Link to="/about" className="px-4 py-4 hover:bg-buttons dark:hover:text-white font-montserrat cursor-pointer dark:text-gray-300" onClick={handleMenuItemClick}>About us</Link>
+              <Link to="/team" className="px-4 py-4 hover:bg-buttons dark:hover:text-white font-montserrat cursor-pointer dark:text-gray-300" onClick={handleMenuItemClick}>About Team</Link>
+              <Link to="/services" className="px-4 py-4 hover:bg-buttons dark:hover:text-white font-montserrat cursor-pointer dark:text-gray-300" onClick={handleMenuItemClick}>Services</Link>
+              <Link to="/contact" className="px-4 py-4 hover:bg-buttons dark:hover:text-white font-montserrat cursor-pointer dark:text-gray-300" onClick={handleMenuItemClick}>Contact us</Link>
+              <Link to="/faq" className="px-4 py-4 hover:bg-buttons dark:hover:text-white font-montserrat cursor-pointer dark:text-gray-300" onClick={handleMenuItemClick}>FAQ</Link>
+              <Link to="/whilelist" className="px-4 py-4 hover:bg-buttons dark:hover:text-white font-montserrat cursor-pointer dark:text-gray-300" onClick={handleMenuItemClick}>Wishlist</Link>
             </div>
           </div>
         </div>
@@ -65,15 +65,15 @@ const Navbar = () => {
         {/* Shop dropdown - Only for authenticated users */}
         {user && (
           <div className="relative" onMouseEnter={() => setOpenMenu('shop')}>
-            <button className="flex gap-1 items-center font-montserrat text-white hover:font-montserratBold">
+            <button className="flex gap-1 items-center font-montserrat text-white hover:font-montserratBold transition-all">
               Shop
               <ChevronDown size={14} className={`text-white transition-transform duration-300 ${openMenu === 'shop' ? 'rotate-180' : ''}`} />
             </button>
-            <div className={`absolute left-0 mt-[18px] w-48 bg-white border rounded shadow-lg z-10 transition-all duration-300 origin-top ${openMenu === 'shop' ? 'opacity-100 transform scale-y-100' : 'opacity-0 transform scale-y-0'}`}>
+            <div className={`absolute left-0 mt-[18px] w-48 bg-white dark:bg-slate-900 border dark:border-slate-800 rounded shadow-lg z-10 transition-all duration-300 origin-top ${openMenu === 'shop' ? 'opacity-100 transform scale-y-100' : 'opacity-0 transform scale-y-0'}`}>
               <div className="w-full flex flex-col">
-                <Link to="/shop" className="px-4 py-4 hover:bg-buttons font-montserrat cursor-pointer" onClick={handleMenuItemClick}>Product Listings</Link>
-                <Link to="/categories" className="px-4 py-4 hover:bg-buttons font-montserrat cursor-pointer" onClick={handleMenuItemClick}>Categories</Link>
-                <Link to="/account" className="px-4 py-4 hover:bg-buttons font-montserrat cursor-pointer" onClick={handleMenuItemClick}>Account</Link>
+                <Link to="/shop" className="px-4 py-4 hover:bg-buttons dark:hover:text-white font-montserrat cursor-pointer dark:text-gray-300" onClick={handleMenuItemClick}>Product Listings</Link>
+                <Link to="/categories" className="px-4 py-4 hover:bg-buttons dark:hover:text-white font-montserrat cursor-pointer dark:text-gray-300" onClick={handleMenuItemClick}>Categories</Link>
+                <Link to="/account" className="px-4 py-4 hover:bg-buttons dark:hover:text-white font-montserrat cursor-pointer dark:text-gray-300" onClick={handleMenuItemClick}>Account</Link>
               </div>
             </div>
           </div>
@@ -82,14 +82,14 @@ const Navbar = () => {
         {/* Blogs dropdown - Only for authenticated users */}
         {user && (
           <div className="relative" onMouseEnter={() => setOpenMenu('blogs')}>
-            <button className="flex gap-1 items-center text-white font-montserrat hover:font-montserratBold">
+            <button className="flex gap-1 items-center text-white font-montserrat hover:font-montserratBold transition-all">
               Blogs
               <ChevronDown size={14} className={`text-white transition-transform duration-300 ${openMenu === 'blogs' ? 'rotate-180' : ''}`} />
             </button>
-            <div className={`absolute left-0 mt-[18px] w-48 bg-white border rounded shadow-lg z-10 transition-all duration-300 origin-top ${openMenu === 'blogs' ? 'opacity-100 transform scale-y-100' : 'opacity-0 transform scale-y-0'}`}>
+            <div className={`absolute left-0 mt-[18px] w-48 bg-white dark:bg-slate-900 border dark:border-slate-800 rounded shadow-lg z-10 transition-all duration-300 origin-top ${openMenu === 'blogs' ? 'opacity-100 transform scale-y-100' : 'opacity-0 transform scale-y-0'}`}>
               <div className="w-full flex flex-col">
-                <Link to="/blog" className="px-4 py-4 hover:bg-buttons font-montserrat cursor-pointer" onClick={handleMenuItemClick}>Blog</Link>
-                <Link to="/blogarticle" className="px-4 py-4 hover:bg-buttons font-montserrat cursor-pointer" onClick={handleMenuItemClick}>Blog Article</Link>
+                <Link to="/blog" className="px-4 py-4 hover:bg-buttons dark:hover:text-white font-montserrat cursor-pointer dark:text-gray-300" onClick={handleMenuItemClick}>Blog</Link>
+                <Link to="/blogarticle" className="px-4 py-4 hover:bg-buttons dark:hover:text-white font-montserrat cursor-pointer dark:text-gray-300" onClick={handleMenuItemClick}>Blog Article</Link>
               </div>
             </div>
           </div>
