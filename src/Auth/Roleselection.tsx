@@ -1,48 +1,93 @@
 // src/components/RoleSelection.tsx
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 
 const RoleSelection = () => {
+  const [selectedRole, setSelectedRole] = useState<"client" | "client_admin" | "agent" | null>(null);
   const navigate = useNavigate();
 
+  const handleRoleSelect = (role: "client" | "client_admin" | "agent") => {
+    setSelectedRole(role);
+  };
+
   const handleContinue = () => {
-    navigate("/register/admin");
+    if (selectedRole === "client") {
+      navigate("/register/client");
+    } else if (selectedRole === "client_admin") {
+      navigate("/register/admin");
+    } else if (selectedRole === "agent") {
+      navigate("/register/agent");
+    }
   };
 
   return (
     <div className="w-full flex justify-center items-center min-h-screen p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-2xl">
         <CardHeader>
-          <CardTitle>Register as Merchant</CardTitle>
-          <CardDescription>Create your business account to manage products and sales</CardDescription>
+          <CardTitle>Select Your Role</CardTitle>
+          <CardDescription>Choose how you want to use our platform</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
-          <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card 
-              className="cursor-pointer p-4 text-center border-2 border-blue-500 bg-blue-50 transition-all"
-              onClick={handleContinue}
+              className={`cursor-pointer p-4 text-center border-2 transition-all ${
+                selectedRole === "client" 
+                  ? "border-accent bg-accent/10" 
+                  : "border-border hover:border-accent/50"
+              }`}
+              onClick={() => handleRoleSelect("client")}
             >
-              <h3 className="font-semibold mb-2">🏢 Client Admin (Merchant)</h3>
-              <p className="text-sm text-gray-600">
-                Manage your business products, blogs, and sales
+              <h3 className="font-semibold mb-2">👤 Client</h3>
+              <p className="text-sm text-muted-foreground">
+                Shop, browse products, and make reviews
+              </p>
+            </Card>
+
+            <Card 
+              className={`cursor-pointer p-4 text-center border-2 transition-all ${
+                selectedRole === "client_admin" 
+                  ? "border-accent bg-accent/10" 
+                  : "border-border hover:border-accent/50"
+              }`}
+              onClick={() => handleRoleSelect("client_admin")}
+            >
+              <h3 className="font-semibold mb-2">🏢 Merchant</h3>
+              <p className="text-sm text-muted-foreground">
+                Manage your business products and sales
+              </p>
+            </Card>
+
+            <Card 
+              className={`cursor-pointer p-4 text-center border-2 transition-all ${
+                selectedRole === "agent" 
+                  ? "border-accent bg-accent/10" 
+                  : "border-border hover:border-accent/50"
+              }`}
+              onClick={() => handleRoleSelect("agent")}
+            >
+              <h3 className="font-semibold mb-2">🕵️ Agent</h3>
+              <p className="text-sm text-muted-foreground">
+                Promote products and earn commissions
               </p>
             </Card>
           </div>
 
           <Button 
             onClick={handleContinue} 
+            disabled={!selectedRole}
             className="w-full"
           >
-            Continue to Registration
+            Continue to {selectedRole ? selectedRole.replace('_', ' ') + " registration" : "Registration"}
           </Button>
 
           <div className="text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-muted-foreground">
               Already have an account?{" "}
               <Button 
                 variant="link" 
-                className="p-0 h-auto" 
+                className="p-0 h-auto text-accent" 
                 onClick={() => navigate("/login")}
               >
                 Login here

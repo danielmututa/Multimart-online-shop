@@ -127,16 +127,20 @@ const Account = () => {
               <p className="text-sm md:text-[16px] font-light">{user.email || "user@example.com"}</p>
             </SheetTitle>
 
-            <SheetDescription className="flex pt-3 justify-between w-full">
-              <p className="text-sm md:text-[16px]">Role</p>
-              <p className="text-sm md:text-[16px]">{user.role || "Admin"}</p>
+            <SheetDescription asChild>
+              <div className="flex pt-3 justify-between w-full">
+                <span className="text-sm md:text-[16px]">Role</span>
+                <span className="text-sm md:text-[16px]">{user.role || "Admin"}</span>
+              </div>
             </SheetDescription>
 
               
-              <SheetDescription className="flex pt-3 justify-between w-full">
-  <p className="text-sm md:text-[16px]">Phone</p>
-  <p className="text-sm md:text-[16px]">{user.phone || "Not provided"}</p>
-</SheetDescription>
+            <SheetDescription asChild>
+              <div className="flex pt-3 justify-between w-full">
+                <span className="text-sm md:text-[16px]">Phone</span>
+                <span className="text-sm md:text-[16px]">{user.phone || "Not provided"}</span>
+              </div>
+            </SheetDescription>
 
 
             <div className="w-full border"></div>
@@ -149,54 +153,56 @@ const Account = () => {
                     <h2 className="text-xl">Change Password</h2>
                   </AccordionTrigger>
                   <AccordionContent>
-                    <SheetDescription className="flex gap-2 flex-col justify-between w-full">
-                      <Input
-                        name="currentPassword"
-                        placeholder="Current Password"
-                        type="password"
-                        className="py-2"
-                        value={changePasswordData.currentPassword}
-                        onChange={handleChangePasswordInput}
-                      />
-                      <Input
-                        name="newPassword"
-                        placeholder="New Password"
-                        type="password"
-                        className="py-2"
-                        value={changePasswordData.newPassword}
-                        onChange={handleChangePasswordInput}
-                      />
-                      <Input
-                        name="confirmNewPassword"
-                        placeholder="Confirm Password"
-                        type="password"
-                        className="py-2"
-                        value={changePasswordData.confirmNewPassword}
-                        onChange={handleChangePasswordInput}
-                      />
+                    <SheetDescription asChild>
+                      <div className="flex gap-2 flex-col justify-between w-full">
+                        <Input
+                          name="currentPassword"
+                          placeholder="Current Password"
+                          type="password"
+                          className="py-2"
+                          value={changePasswordData.currentPassword}
+                          onChange={handleChangePasswordInput}
+                        />
+                        <Input
+                          name="newPassword"
+                          placeholder="New Password"
+                          type="password"
+                          className="py-2"
+                          value={changePasswordData.newPassword}
+                          onChange={handleChangePasswordInput}
+                        />
+                        <Input
+                          name="confirmNewPassword"
+                          placeholder="Confirm Password"
+                          type="password"
+                          className="py-2"
+                          value={changePasswordData.confirmNewPassword}
+                          onChange={handleChangePasswordInput}
+                        />
 
-                      <div className="w-full flex justify-between">
-                        <Button
-                          className="mt-4"
-                          onClick={handleChangePassword}
-                          disabled={loading}
-                        >
-                          {loading ? "Changing..." : "Change Password"}
-                        </Button>
-                        <Button
-                          type="button"
-                          className="mt-4"
-                          variant="outline"
-                          onClick={() =>
-                            setChangePasswordData({
-                              currentPassword: "",
-                              newPassword: "",
-                              confirmNewPassword: "",
-                            })
-                          }
-                        >
-                          Cancel
-                        </Button>
+                        <div className="w-full flex justify-between">
+                          <Button
+                            className="mt-4"
+                            onClick={handleChangePassword}
+                            disabled={loading}
+                          >
+                            {loading ? "Changing..." : "Change Password"}
+                          </Button>
+                          <Button
+                            type="button"
+                            className="mt-4"
+                            variant="outline"
+                            onClick={() =>
+                              setChangePasswordData({
+                                currentPassword: "",
+                                newPassword: "",
+                                confirmNewPassword: "",
+                              })
+                            }
+                          >
+                            Cancel
+                          </Button>
+                        </div>
                       </div>
                     </SheetDescription>
                   </AccordionContent>

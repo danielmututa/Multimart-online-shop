@@ -17,7 +17,7 @@ const WhatsAppContact: React.FC<WhatsAppContactProps> = ({
   
   // Create WhatsApp message
   const message = encodeURIComponent(
-    `Hi! I'm interested in "${productName}". Can you provide more details?`
+    `Hello,\nI am interested in the product ${productName} listed on Multimart Online Shop.\nCould you kindly provide more details regarding availability and delivery options?\n\nThank you.`
   );
   
   // WhatsApp link - uses the cleaned phone number from client_admin

@@ -13,6 +13,7 @@ export const ProductSchema = z.object({
   created_at: z.string().datetime(),
   updated_at: z.string().datetime(),
   discount_percentage: z.number(),
+  whatsapp_number: z.string().optional().nullable(),
   views: z.number(),
   // Removed category_name since it's not used in the backend response or form
   categories: z

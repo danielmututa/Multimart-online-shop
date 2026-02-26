@@ -3,10 +3,13 @@ import { ChevronDown, Search, ShoppingCart } from 'lucide-react';
 import { NavLink, Link } from 'react-router-dom';
 import Account from '@/Account/Account';
 import { useCart } from './shop/CartContext';
-import logo from "./Images/ChatGPT Image Jan 23, 2026, 12_18_42 PM.png"  // Import useCart
+import { useAuthStore } from '@/context/userContext';
+import { ModeToggle } from './ModeToggle';
+import logo from "./Images/ChatGPT Image Jan 23, 2026, 12_18_42 PM.png"
 
 const Navbar = () => {
-  const { cart } = useCart(); // Corrected from cartItems
+  const { cart } = useCart();
+  const { user } = useAuthStore();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -59,34 +62,38 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Shop dropdown */}
-        <div className="relative" onMouseEnter={() => setOpenMenu('shop')}>
-          <button className="flex gap-1 items-center font-montserrat text-white hover:font-montserratBold">
-            Shop
-            <ChevronDown size={14} className={`text-white transition-transform duration-300 ${openMenu === 'shop' ? 'rotate-180' : ''}`} />
-          </button>
-          <div className={`absolute left-0 mt-[18px] w-48 bg-white border rounded shadow-lg z-10 transition-all duration-300 origin-top ${openMenu === 'shop' ? 'opacity-100 transform scale-y-100' : 'opacity-0 transform scale-y-0'}`}>
-            <div className="w-full flex flex-col">
-              <Link to="/shop" className="px-4 py-4 hover:bg-buttons font-montserrat cursor-pointer" onClick={handleMenuItemClick}>Product Listings</Link>
-              <Link to="/categories" className="px-4 py-4 hover:bg-buttons font-montserrat cursor-pointer" onClick={handleMenuItemClick}>Categories</Link>
-              <Link to="/account" className="px-4 py-4 hover:bg-buttons font-montserrat cursor-pointer" onClick={handleMenuItemClick}>Account</Link>
+        {/* Shop dropdown - Only for authenticated users */}
+        {user && (
+          <div className="relative" onMouseEnter={() => setOpenMenu('shop')}>
+            <button className="flex gap-1 items-center font-montserrat text-white hover:font-montserratBold">
+              Shop
+              <ChevronDown size={14} className={`text-white transition-transform duration-300 ${openMenu === 'shop' ? 'rotate-180' : ''}`} />
+            </button>
+            <div className={`absolute left-0 mt-[18px] w-48 bg-white border rounded shadow-lg z-10 transition-all duration-300 origin-top ${openMenu === 'shop' ? 'opacity-100 transform scale-y-100' : 'opacity-0 transform scale-y-0'}`}>
+              <div className="w-full flex flex-col">
+                <Link to="/shop" className="px-4 py-4 hover:bg-buttons font-montserrat cursor-pointer" onClick={handleMenuItemClick}>Product Listings</Link>
+                <Link to="/categories" className="px-4 py-4 hover:bg-buttons font-montserrat cursor-pointer" onClick={handleMenuItemClick}>Categories</Link>
+                <Link to="/account" className="px-4 py-4 hover:bg-buttons font-montserrat cursor-pointer" onClick={handleMenuItemClick}>Account</Link>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Blogs dropdown */}
-        <div className="relative" onMouseEnter={() => setOpenMenu('blogs')}>
-          <button className="flex gap-1 items-center text-white font-montserrat hover:font-montserratBold">
-            Blogs
-            <ChevronDown size={14} className={`text-white transition-transform duration-300 ${openMenu === 'blogs' ? 'rotate-180' : ''}`} />
-          </button>
-          <div className={`absolute left-0 mt-[18px] w-48 bg-white border rounded shadow-lg z-10 transition-all duration-300 origin-top ${openMenu === 'blogs' ? 'opacity-100 transform scale-y-100' : 'opacity-0 transform scale-y-0'}`}>
-            <div className="w-full flex flex-col">
-              <Link to="/blog" className="px-4 py-4 hover:bg-buttons font-montserrat cursor-pointer" onClick={handleMenuItemClick}>Blog</Link>
-              <Link to="/blogarticle" className="px-4 py-4 hover:bg-buttons font-montserrat cursor-pointer" onClick={handleMenuItemClick}>Blog Article</Link>
+        {/* Blogs dropdown - Only for authenticated users */}
+        {user && (
+          <div className="relative" onMouseEnter={() => setOpenMenu('blogs')}>
+            <button className="flex gap-1 items-center text-white font-montserrat hover:font-montserratBold">
+              Blogs
+              <ChevronDown size={14} className={`text-white transition-transform duration-300 ${openMenu === 'blogs' ? 'rotate-180' : ''}`} />
+            </button>
+            <div className={`absolute left-0 mt-[18px] w-48 bg-white border rounded shadow-lg z-10 transition-all duration-300 origin-top ${openMenu === 'blogs' ? 'opacity-100 transform scale-y-100' : 'opacity-0 transform scale-y-0'}`}>
+              <div className="w-full flex flex-col">
+                <Link to="/blog" className="px-4 py-4 hover:bg-buttons font-montserrat cursor-pointer" onClick={handleMenuItemClick}>Blog</Link>
+                <Link to="/blogarticle" className="px-4 py-4 hover:bg-buttons font-montserrat cursor-pointer" onClick={handleMenuItemClick}>Blog Article</Link>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
 
       {/* Icons */}
@@ -99,11 +106,13 @@ const Navbar = () => {
 
         <Account />
         
-        {/* Login fallback if no user */}
-        <Link to="/cart" className="flex items-center gap-2">
+        {/* Cart - Redirect to register if not logged in */}
+        <Link to={user ? "/cart" : "/register/client"} className="flex items-center gap-2">
           <ShoppingCart size={18} className="text-white hover:text-buttons font-extrabold" />
-          <span className="text-white text-sm font-montserrat">{cart?.length ?? 0}</span> {/* Safe access */}
+          <span className="text-white text-sm font-montserrat">{cart?.length ?? 0}</span>
         </Link>
+
+        <ModeToggle />
       </div>
 
       </div>

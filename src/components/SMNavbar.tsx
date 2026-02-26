@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { ChevronDown, Search, ShoppingCart } from 'lucide-react';
 import { NavLink, Link } from 'react-router-dom';
 import { useCart } from './shop/CartContext';
+import { ModeToggle } from './ModeToggle';
 import logo from "./Images/ChatGPT Image Jan 23, 2026, 12_18_42 PM.png"
 
 const MobileNavbar: React.FC = () => {
@@ -136,6 +137,8 @@ const MobileNavbar: React.FC = () => {
                 <ShoppingCart size={18} className="text-white" />
                 <span className="text-white absolute top-0 right-[-6px] text-[8px] font-montserrat">{cart?.length ?? 0}</span>
               </Link>
+              
+              <ModeToggle />
             </div>
           </div>
         </div>

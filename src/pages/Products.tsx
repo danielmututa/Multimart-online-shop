@@ -27,6 +27,7 @@ const Products: React.FC<ProductTableProps> = ({ onProductAction }) => {
     stock_quantity: "",
     category_name: "",
     discount_percentage: "",
+    whatsapp_number: "",
   })
 
   const [imageFile, setImageFile] = useState<File | null>(null)
@@ -141,6 +142,7 @@ const Products: React.FC<ProductTableProps> = ({ onProductAction }) => {
             stock_quantity: product.stock_quantity.toString(),
             category_name: product.categories?.name || "",
             discount_percentage: product.discount_percentage.toString(),
+            whatsapp_number: product.whatsapp_number || "",
           })
 
           toast.dismiss(loadingToastId)
@@ -273,6 +275,7 @@ const Products: React.FC<ProductTableProps> = ({ onProductAction }) => {
       formDataToSend.append("stock_quantity", formData.stock_quantity)
       formDataToSend.append("category_name", formData.category_name.trim())
       formDataToSend.append("discount_percentage", formData.discount_percentage || "0")
+      formDataToSend.append("whatsapp_number", formData.whatsapp_number.trim() || "")
 
       if (imageFile) {
         formDataToSend.append("file", imageFile)
@@ -308,6 +311,7 @@ const Products: React.FC<ProductTableProps> = ({ onProductAction }) => {
         stock_quantity: "",
         category_name: "",
         discount_percentage: "",
+        whatsapp_number: "",
       })
       setImageFile(null)
       setUseNewCategory(false)
@@ -498,6 +502,21 @@ const Products: React.FC<ProductTableProps> = ({ onProductAction }) => {
               className="w-full"
               placeholder="Enter product discount"
               value={formData.discount_percentage}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="whatsapp_number" className="block text-sm font-medium">
+              WhatsApp Number (Optional)
+            </label>
+            <Input
+              id="whatsapp_number"
+              name="whatsapp_number"
+              type="text"
+              className="w-full"
+              placeholder="Enter WhatsApp number (e.g., +263...)"
+              value={formData.whatsapp_number}
               onChange={handleInputChange}
             />
           </div>

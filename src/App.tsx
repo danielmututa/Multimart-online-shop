@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import { useAuthStore } from '@/context/userContext';
 import {RoleProtectedRoute} from '@/Auth/RoleBaseselection';
 import RoleBasedRedirect from './Auth/Protectedroutes/RolebasedRedirect';
+import { MainPublicRoute } from './Auth/Protectedroutes/MainPublicRoute';
 import { AuthRoute } from '@/Auth/AuthRoute/AuthRoute';
 import { CartProvider } from './components/shop/CartContext';
 import Navbar from "./components/Navbar";
@@ -71,30 +72,40 @@ function App() {
             <Route element={<AuthRoute />}>
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<SelectrolePage />} />
+              <Route path="/register/client" element={<RegisterPage role="client" />} />
               <Route path="/register/admin" element={<RegisterPage role="client_admin" />} />
             </Route>
 
 
             {/* ============================================ */}
-            {/* PUBLIC ROUTES - No login required for clients */}
+            {/* PROTECTED CLIENT ROUTES - Login required */}
             {/* ============================================ */}
-            <Route path="/" element={<><Navbar /><MediaNavbar /><Home /><Footer /></>} />
-            <Route path="/home" element={<><Navbar /><MediaNavbar /><Home /><Footer /></>} />
+            <Route element={<RoleProtectedRoute requiredRole="user" redirectTo="/register" />}>
+              <Route path="/blog" element={<><Navbar /><MediaNavbar /><BlogList /><Footer /></>} />
+              <Route path="/blog/:id" element={<><Navbar /><MediaNavbar /><Blog /><Footer /></>} />
+              <Route path="/blogarticle" element={<><Navbar /><MediaNavbar /><Blogarticle /><Footer /></>} />
+              <Route path="/shop" element={<><Navbar /><MediaNavbar /><Shop /><Footer /></>} />
+              <Route path="/categories" element={<><Navbar /><MediaNavbar /><Categories /><Footer /></>} />
+              <Route path="/account" element={<><Navbar /><MediaNavbar /><Account /><Footer /></>} />
+              <Route path="/cart" element={<><Navbar /><MediaNavbar /><CartItems /><Footer /></>} />
+              <Route path="/bill" element={<><Navbar /><MediaNavbar /><PaymentForm /><Footer /></>} />
+            </Route>
+
+            {/* ============================================ */}
+            {/* PUBLIC LANDING PAGES - Redirects Admins to Dashboard */}
+            {/* ============================================ */}
+            <Route element={<MainPublicRoute />}>
+              <Route path="/" element={<><Navbar /><MediaNavbar /><Home /><Footer /></>} />
+              <Route path="/home" element={<><Navbar /><MediaNavbar /><Home /><Footer /></>} />
+              <Route path="/about" element={<><Navbar /><MediaNavbar /><Aboutus /><Footer /></>} />
+              <Route path="/team" element={<><Navbar /><MediaNavbar /><Aboutteam /><Footer /></>} />
+              <Route path="/services" element={<><Navbar /><MediaNavbar /><Services /><Footer /></>} />
+              <Route path="/contact" element={<><Navbar /><MediaNavbar /><Contactpage /><Footer /></>} />
+              <Route path="/faq" element={<><Navbar /><MediaNavbar /><FQA /><Footer /></>} />
+              <Route path="/whilelist" element={<><Navbar /><MediaNavbar /><Whilelist /><Footer /></>} />
+            </Route>
+
             <Route path="/search" element={<><Navbar /><MediaNavbar /><AIChartbot /><Footer /></>} />
-            <Route path="/blog" element={<><Navbar /><MediaNavbar /><BlogList /><Footer /></>} />
-            <Route path="/blog/:id" element={<><Navbar /><MediaNavbar /><Blog /><Footer /></>} />
-            <Route path="/blogarticle" element={<><Navbar /><MediaNavbar /><Blogarticle /><Footer /></>} />
-            <Route path="/about" element={<><Navbar /><MediaNavbar /><Aboutus /><Footer /></>} />
-            <Route path="/team" element={<><Navbar /><MediaNavbar /><Aboutteam /><Footer /></>} />
-            <Route path="/services" element={<><Navbar /><MediaNavbar /><Services /><Footer /></>} />
-            <Route path="/contact" element={<><Navbar /><MediaNavbar /><Contactpage /><Footer /></>} />
-            <Route path="/faq" element={<><Navbar /><MediaNavbar /><FQA /><Footer /></>} />
-            <Route path="/whilelist" element={<><Navbar /><MediaNavbar /><Whilelist /><Footer /></>} />
-            <Route path="/shop" element={<><Navbar /><MediaNavbar /><Shop /><Footer /></>} />
-            <Route path="/categories" element={<><Navbar /><MediaNavbar /><Categories /><Footer /></>} />
-            <Route path="/account" element={<><Navbar /><MediaNavbar /><Account /><Footer /></>} />
-            <Route path="/cart" element={<><Navbar /><MediaNavbar /><CartItems /><Footer /></>} />
-            <Route path="/bill" element={<><Navbar /><MediaNavbar /><PaymentForm /><Footer /></>} />
 
 
             {/* ============================================ */}

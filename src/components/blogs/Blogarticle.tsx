@@ -4,8 +4,24 @@
 
 import React from 'react';
 import { Heart } from 'lucide-react';
+import { useAuthStore } from '@/context/userContext';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const Blogarticle: React.FC = () => {
+  const { user } = useAuthStore();
+  const navigate = useNavigate();
+
+  const handleCommentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) {
+      toast.error("Please register as a client to post a comment");
+      setTimeout(() => navigate("/register/client"), 1500);
+      return;
+    }
+    // Logic for posting comment would go here
+    toast.success("Comment posted successfully!");
+  };
   return (
     <div>
       <div className="flex flex-col justify-center pt-[110px] px-5 md:px-10 lg:px-20 xl:px-[100px] items-center">
@@ -73,7 +89,7 @@ const Blogarticle: React.FC = () => {
           </div>
         </div>
 
-        <form className="flex justify-end items-end flex-col text-center gap-1 w-full xl:w-[60%] pt-8 mb-20">
+        <form onSubmit={handleCommentSubmit} className="flex justify-end items-end flex-col text-center gap-1 w-full xl:w-[60%] pt-8 mb-20">
           <textarea 
             name="" 
             className='text-sm md:text-[16px] xl:text-[18px] w-full h-[150px] border border-buttons outline-none px-5 pt-[8px] font-montserrat text-buttons' 

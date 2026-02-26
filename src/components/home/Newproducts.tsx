@@ -23,6 +23,7 @@ interface Product {
   discount_percentage?: number
   rating?: number
   description?: string
+  whatsapp_number?: string
   views?: number
   reviews?: Review[]
   client_admin_id?: number // ID of the user who posted this product
@@ -257,6 +258,12 @@ const openDialog = async (product: Product) => {
     e.preventDefault()
     e.stopPropagation()
 
+    if (!user) {
+      showToast("Please register as a client to add items to your cart", "error")
+      setTimeout(() => navigate("/register/client"), 1500)
+      return
+    }
+
     if (product.stock_quantity <= 0) {
       showToast("This product is currently out of stock.", "error")
       return
@@ -284,9 +291,16 @@ const openDialog = async (product: Product) => {
   const handleAddToCartFromDialog = async () => {
     if (!selectedProduct) return
 
+    if (!user) {
+      showToast("Please register as a client to add items to your cart", "error")
+      setTimeout(() => navigate("/register/client"), 1500)
+      return
+    }
+
     if (selectedProduct.stock_quantity <= 0) {
       showToast("This product is currently out of stock.", "error")
-    } else {
+      return
+    }
       setAddingToCart(selectedProduct.id)
       try {
         const result = await addToCart(selectedProduct.id, quantity)
@@ -304,7 +318,6 @@ const openDialog = async (product: Product) => {
         setAddingToCart(null)
       }
     }
-  }
 
   const goToCart = () => navigate("/cart")
   const goToShop = () => navigate("/shop")
@@ -344,6 +357,12 @@ const openDialog = async (product: Product) => {
   }
 
   const handleSubmitReview = async () => {
+    if (!user) {
+      showToast("Please register as a client to add a review.", "error")
+      setTimeout(() => navigate("/register/client"), 1500)
+      return
+    }
+
     if (!selectedProduct || !newReview.comment.trim()) {
       showToast("Please add a comment for your review.", "error")
       return
@@ -600,40 +619,23 @@ const openDialog = async (product: Product) => {
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-3 pt-6">
-                    {/* WhatsApp Contact Section - Now uses client_admin phone */}
-                    {(() => {
-                      // Debug logging
-                      console.log("Selected Product:", selectedProduct);
-                      console.log("Client Admin:", selectedProduct?.client_admin);
-                      console.log("Phone:", selectedProduct?.client_admin?.phone);
-                      
-                      return selectedProduct?.client_admin?.phone ? (
-                        <div className="w-full pt-4 border-t">
-                          <WhatsAppContact 
-                            phone={selectedProduct.client_admin.phone}
-                            productName={selectedProduct.name}
-                          />
-                          <p className="text-xs text-gray-500 text-center mt-2">
-                            Contact the seller directly via WhatsApp
-                          </p>
-                          <p className="text-xs text-gray-400 text-center mt-1">
-                            Phone: {selectedProduct.client_admin.phone}
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="w-full pt-4 border-t">
-                          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                            <p className="text-sm text-yellow-800 text-center font-semibold">
-                              Contact information not available for this product
-                            </p>
-                            <p className="text-xs text-yellow-600 text-center mt-2">
-                              The seller has not provided contact details yet
+                    <div className="flex flex-col sm:flex-row gap-3 pt-6">
+                      {(() => {
+                        // Use whatsapp_number from product first, fallback to client_admin.phone
+                        const contactPhone = selectedProduct?.whatsapp_number || selectedProduct?.client_admin?.phone;
+                        
+                        return contactPhone ? (
+                          <div className="w-full pt-4 border-t">
+                            <WhatsAppContact 
+                              phone={contactPhone}
+                              productName={selectedProduct.name}
+                            />
+                            <p className="text-xs text-gray-500 text-center mt-2">
+                              Contact the seller directly via WhatsApp
                             </p>
                           </div>
-                        </div>
-                      );
-                    })()}
+                        ) : null;
+                      })()}
 
                     <div className="border-t pt-6 mt-6 flex justify-between w-full flex-col ">
                       <div className="flex justify-between gap-8 w-full pb-6">

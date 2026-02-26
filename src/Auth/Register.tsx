@@ -27,7 +27,7 @@ interface RegisterFormData {
 }
 
 interface RegisterProps {
-  role?: 'client_admin' | 'agent';
+  role?: 'client' | 'client_admin' | 'agent';
 }
 
 const Register = ({ role }: RegisterProps = {}) => {
@@ -36,9 +36,9 @@ const Register = ({ role }: RegisterProps = {}) => {
   
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  // Default to client_admin, no more 'client' option
-  const [registerType, setRegisterType] = useState<'client_admin' | 'agent'>(
-    role === 'agent' ? 'agent' : 'client_admin'
+  // Default to client, no more 'client' option
+  const [registerType, setRegisterType] = useState<'client' | 'client_admin' | 'agent'>(
+    role === 'agent' ? 'agent' : role === 'client_admin' ? 'client_admin' : 'client'
   )
   const [gettingLocation, setGettingLocation] = useState(false)
 
@@ -48,7 +48,31 @@ const Register = ({ role }: RegisterProps = {}) => {
     formState: { errors, isSubmitting },
     watch,
     setValue,
-  } = useForm<RegisterFormData>()
+  } = useForm<RegisterFormData>({
+    defaultValues: {
+      username: localStorage.getItem("reg_username") || "",
+      email: localStorage.getItem("reg_email") || "",
+      phone: localStorage.getItem("reg_phone") || "",
+      physicalAddress: localStorage.getItem("reg_address") || "",
+      commissionRate: Number(localStorage.getItem("reg_commission")) || 0,
+      payoutNumber: localStorage.getItem("reg_payout") || "",
+    }
+  })
+
+  const watchedFields = watch([
+    "username", "email", "phone", "physicalAddress", 
+    "commissionRate", "payoutNumber"
+  ])
+
+  useEffect(() => {
+    const [username, email, phone, physicalAddress, commissionRate, payoutNumber] = watchedFields
+    if (username) localStorage.setItem("reg_username", username)
+    if (email) localStorage.setItem("reg_email", email)
+    if (phone) localStorage.setItem("reg_phone", phone)
+    if (physicalAddress) localStorage.setItem("reg_address", physicalAddress)
+    if (commissionRate) localStorage.setItem("reg_commission", String(commissionRate))
+    if (payoutNumber) localStorage.setItem("reg_payout", payoutNumber)
+  }, [watchedFields])
 
   useEffect(() => {
     console.log("Register - Current user:", user)
@@ -57,7 +81,7 @@ const Register = ({ role }: RegisterProps = {}) => {
   // Update registerType when role prop changes
   useEffect(() => {
     if (role) {
-      setRegisterType(role === 'agent' ? 'agent' : 'client_admin')
+      setRegisterType(role)
     }
   }, [role])
 
@@ -154,9 +178,23 @@ const Register = ({ role }: RegisterProps = {}) => {
 
       toast.dismiss(loadingToastId)
       toast.success("✅ Account created successfully!")
+
+      // Clear persistence on success
+      localStorage.removeItem("reg_username")
+      localStorage.removeItem("reg_email")
+      localStorage.removeItem("reg_phone")
+      localStorage.removeItem("reg_address")
+      localStorage.removeItem("reg_commission")
+      localStorage.removeItem("reg_payout")
       
       setTimeout(() => {
-        navigate("/")
+        if (registerType === 'client_admin') {
+          navigate("/admin-dashboard")
+        } else if (registerType === 'agent') {
+          navigate("/agent-dashboard")
+        } else {
+          navigate("/")
+        }
       }, 300)
     } catch (error: unknown) {
       console.log("Registration error:", error)
@@ -180,7 +218,9 @@ const Register = ({ role }: RegisterProps = {}) => {
           <Card className="w-full">
             <CardHeader>
               <CardTitle>Create Account</CardTitle>
-              <CardDescription>Register as a merchant or agent</CardDescription>
+              <CardDescription>
+                {registerType === 'client' ? 'Register as a customer' : 'Register as a merchant or agent'}
+              </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
               {/* Registration Type Selection */}
@@ -188,13 +228,14 @@ const Register = ({ role }: RegisterProps = {}) => {
                 <label className="text-sm font-medium">Register As</label>
                 <Select 
                   value={registerType} 
-                  onValueChange={(value: 'client_admin' | 'agent') => setRegisterType(value)}
+                  onValueChange={(value: 'client' | 'client_admin' | 'agent') => setRegisterType(value)}
                   disabled={!!role} // Disable if role is provided via prop
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select account type" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="client">Client (Customer)</SelectItem>
                     <SelectItem value="client_admin">Client Admin (Merchant)</SelectItem>
                     <SelectItem value="agent">Agent (Sales Representative)</SelectItem>
                   </SelectContent>
