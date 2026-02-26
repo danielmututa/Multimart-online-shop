@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, X, Plus, Minus, Star, Check, ShoppingCart, Heart } from 'lucide-react';
+import { ChevronRight, X, Plus, Minus, Star, Check, ShoppingCart, Heart, User, Briefcase } from 'lucide-react';
 import { apiClient } from '@/context/axios';
 import { useCart } from './CartContext';
 import { useAuthStore } from '@/context/userContext';
+import AgentApplicationDialog from './AgentApplicationDialog';
+import MyAgentApplications from "./MyAgentApplications";
+import WhatsAppContact from '../home/Whatsappcontact';
 
 interface Product {
   id: number;
@@ -16,8 +19,19 @@ interface Product {
   discount_percentage?: number;
   rating?: number;
   description?: string;
+  whatsapp_number?: string;
   views?: number;
   reviews?: Review[];
+  client_admin_id?: number;
+  client_admin?: {
+    id: number;
+    username?: string;
+    name?: string;
+    merchant_name?: string;
+    email: string;
+    phone: string | null;
+    role: string;
+  };
 }
 
 interface Review {
@@ -59,6 +73,8 @@ const Shop: React.FC = () => {
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [priceRange, setPriceRange] = useState<PriceRange>({ min: 0, max: 5000 });
   const [stockFilter, setStockFilter] = useState<'all' | 'inStock' | 'outStock'>('all');
+  const [isAgentDialogOpen, setIsAgentDialogOpen] = useState(false);
+  const [isMyApplicationsDialogOpen, setIsMyApplicationsDialogOpen] = useState(false);
 
   // Dialog and cart states
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
@@ -84,8 +100,13 @@ const Shop: React.FC = () => {
 
   const ITEMS_PER_PAGE = 9;
 
-  const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://dimpo-pbackend.onrender.com';
-  const getImageUrl = (url: string) => url.startsWith('http') ? url : `${BASE_URL}${url}`;
+  const getImageUrl = (imageUrl: string) => {
+    if (!imageUrl) {
+      console.warn('No image_url provided, using placeholder');
+      return '/placeholder-image.jpg';
+    }
+    return imageUrl;
+  };
   const getProductCategoryName = (product: Product): string => {
     // The categories field is an object with id and name properties
     if (product.categories && product.categories.name) {
@@ -116,15 +137,34 @@ const Shop: React.FC = () => {
     }
   };
 
+  const fetchClientAdminPhone = async (clientAdminId: number): Promise<string | null> => {
+    try {
+      const response = await apiClient.get(`/api/auth/users/${clientAdminId}`);
+      if (response.data?.phone) return response.data.phone;
+      if (response.data?.data?.phone) return response.data.data.phone;
+      if (response.data?.user?.phone) return response.data.user.phone;
+      return null;
+    } catch (err) {
+      console.error("Failed to fetch client admin phone:", err);
+      return null;
+    }
+  };
+
   // Fetch categories from API
   const fetchCategories = async () => {
     try {
       const response = await apiClient.get('/api/categories');
-      console.log("Categories API Response:", response.data);
       setCategories(response.data);
     } catch (err) {
       console.error('Failed to fetch categories:', err);
-      showToast('Failed to load categories', 'error');
+      // Fallback: build categories from products if API fails
+      if (allProducts.length > 0) {
+        const uniqueCategories = Array.from(new Set(allProducts.map(p => p.categories?.name).filter(Boolean)))
+          .map((name, index) => ({ id: index, name: name as string }));
+        if (uniqueCategories.length > 0) {
+          setCategories(uniqueCategories);
+        }
+      }
     }
   };
 
@@ -179,10 +219,26 @@ const Shop: React.FC = () => {
   // Load more products - no longer used as we use pagination buttons
 
   // Dialog functions
-  const openDialog = (product: Product) => {
+  const openDialog = async (product: Product) => {
     setSelectedProduct(product);
     setIsDialogOpen(true);
     setQuantity(1);
+
+    if (product.client_admin_id && !product.client_admin?.phone) {
+      const phone = await fetchClientAdminPhone(product.client_admin_id);
+      if (phone) {
+        setSelectedProduct({
+          ...product,
+          client_admin: {
+            id: product.client_admin_id,
+            username: '',
+            email: '',
+            phone: phone,
+            role: 'client_admin'
+          }
+        });
+      }
+    }
   };
 
   const closeDialog = () => {
@@ -616,102 +672,80 @@ const Shop: React.FC = () => {
             const inStock = card.stock_quantity > 0;
 
             return (
-              <div key={card.id} className="group relative bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-50 flex flex-col h-[480px]">
-                <div className="relative h-[320px] overflow-hidden">
+              <div key={card.id} className="relative h-[500px] lg:h-[450px] group flex flex-col">
+                <div className="relative w-full h-[400px] lg:h-[300px] overflow-hidden">
                   <img
                     loading='lazy'
                     src={getImageUrl(card.image_url)}
                     alt={card.name}
-                    className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
-                    onError={e => { (e.target as HTMLImageElement).src = '/api/products/placeholder.jpg'; }}
+                    className="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105"
+                    onError={e => { (e.target as HTMLImageElement).src = '/placeholder-image.jpg'; }}
                   />
                   
-                  {/* Glassmorphism overlays */}
-                  <div className="absolute inset-0 bg-black/5 group-hover:bg-black/0 transition-colors" />
-                  
-                  {/* Stock/Sale Badges */}
-                  <div className="absolute top-4 left-4 flex flex-col gap-2">
-                    {card.discount_percentage && card.discount_percentage > 0 ? (
-                      <div className="bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-lg">
-                        -{card.discount_percentage}% OFF
-                      </div>
-                    ) : null}
-                    {!inStock ? (
-                      <div className="bg-gray-800/80 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-lg">
-                        COMING SOON
-                      </div>
-                    ) : card.stock_quantity <= 5 ? (
-                      <div className="bg-orange-500 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-lg">
-                        ONLY {card.stock_quantity} LEFT
-                      </div>
-                    ) : null}
-                  </div>
+                  {/* Stock indicators */}
+                  {inStock ? (
+                    <div className="absolute top-2 left-2 bg-[#6600EE] text-white text-xs px-2 py-1 rounded">
+                      {card.stock_quantity} in stock
+                    </div>
+                  ) : (
+                    <div className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
+                      Out of Stock
+                    </div>
+                  )}
+                  {inStock && card.stock_quantity <= 5 && (
+                    <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded">
+                      Only {card.stock_quantity} left!
+                    </div>
+                  )}
 
-                  {/* Quick Action Sidebar (Glassmorphism) */}
-                  <div className="absolute top-1/2 -translate-y-1/2 right-4 flex flex-col gap-3 opacity-0 translate-x-10 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 z-10">
+                  {/* Sidebar actions match Newproducts style */}
+                  <div className="absolute top-0 right-4 h-full flex items-center gap-2 flex-col justify-center opacity-100 translate-y-0 sm:opacity-0 sm:translate-y-5 sm:group-hover:opacity-100 sm:group-hover:translate-y-0 transition-all duration-300">
                     <button
                       onClick={(e) => handleAddToWishlist(card, e)}
-                      className={`p-3 rounded-2xl backdrop-blur-md border border-white/40 shadow-xl transition-all hover:scale-110 ${
-                        isInWishlist ? 'bg-red-500 text-white' : 'bg-white/90 text-gray-800 hover:text-buttons'
+                      className={`p-2 rounded-full shadow-md hover:scale-110 transition-transform ${
+                        isInWishlist ? 'bg-red-500 text-white' : 'bg-white hover:text-buttons'
                       }`}
                     >
-                      <Heart size={20} fill={isInWishlist ? 'currentColor' : 'none'} />
+                      <Heart size={16} fill={isInWishlist ? 'currentColor' : 'none'} />
                     </button>
                     <button
                       onClick={() => openDialog(card)}
-                      className="p-3 bg-white/90 backdrop-blur-md border border-white/40 rounded-2xl shadow-xl transition-all hover:scale-110 text-gray-800 hover:text-buttons"
+                      className="p-2 bg-white rounded-full shadow-md hover:scale-110 transition-transform hover:text-buttons"
                     >
-                      <Plus size={20} />
+                      <Plus size={16} />
                     </button>
                     <button
                       onClick={(e) => handleAddToCart(card, e)}
                       disabled={!inStock || isAddingThis}
-                      className={`p-3 rounded-2xl backdrop-blur-md border border-white/40 shadow-xl transition-all hover:scale-110 ${
-                        !inStock ? 'bg-gray-300/50 cursor-not-allowed text-gray-500' : 
-                        isAddingThis ? 'bg-buttons text-white cursor-wait' : 
-                        'bg-white/90 text-gray-800 hover:text-buttons'
+                      className={`p-2 rounded-full shadow-md hover:scale-110 transition-transform ${
+                        !inStock ? 'bg-gray-300 cursor-not-allowed' : 
+                        isAddingThis ? 'bg-blue-500 text-white cursor-wait' : 
+                        'bg-white hover:text-buttons'
                       }`}
                     >
                       {isAddingThis ? (
-                        <div className="w-5 h-5 border-2 border-buttons border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       ) : (
-                        <ShoppingCart size={20} />
+                        <ShoppingCart size={16} />
                       )}
                     </button>
                    </div>
                 </div>
 
-                <div className="p-6 flex flex-col flex-1">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className='text-[10px] font-bold text-buttons uppercase tracking-widest bg-buttons/5 px-2 py-0.5 rounded'>
-                      {getProductCategoryName(card)}
-                    </span>
-                    <div className="flex gap-0.5">
-                      {renderStars(card.rating ?? 4.5, card.id)}
-                    </div>
-                  </div>
-                  
-                  <h4 className='text-lg font-montserratBold text-gray-800 line-clamp-1 group-hover:text-buttons transition-colors'>
-                    {card.name}
-                  </h4>
-                  
-                  <div className="mt-auto pt-4 flex items-center justify-between">
-                    <div className="flex flex-col">
-                      <p className='text-2xl font-montserratBold text-gray-900'>
-                        ${parseFloat(card.price).toFixed(2)}
-                      </p>
+                <p className="text-sm lg:text-[15px] font-montserrat pt-[10px] text-gray-600">
+                  {getProductCategoryName(card)}
+                </p>
+                <p className="text-[16px] font-montserratBold pt-[14px] leading-[1.1] lg:text-[18px] group-hover:text-buttons transition-colors duration-500">
+                  {card.name}
+                </p>
+                <div className="flex items-center justify-between pt-2">
+                  <div className="flex flex-col">
+                    <p className="text-sm font-montserrat text-gray-600 text-[16px]">
+                      ${parseFloat(card.price).toFixed(2)}
                       {card.discount_percentage && card.discount_percentage > 0 && (
-                        <p className="text-xs text-gray-400 line-through">
-                          ${(parseFloat(card.price) / (1 - card.discount_percentage/100)).toFixed(2)}
-                        </p>
+                        <span className="text-[#6600EE] ml-2">-{card.discount_percentage}%</span>
                       )}
-                    </div>
-                    <button 
-                      onClick={() => openDialog(card)}
-                      className="text-xs font-bold text-buttons border-b-2 border-transparent hover:border-buttons transition-all uppercase tracking-tighter"
-                    >
-                      Quick View
-                    </button>
+                    </p>
                   </div>
                 </div>
               </div>
@@ -867,22 +901,68 @@ const Shop: React.FC = () => {
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-3 pt-6">
-                    <button
-                      onClick={handleAddToCartFromDialog}
-                      disabled={selectedProduct.stock_quantity <= 0 || addingToCart === selectedProduct.id}
-                      className={`flex-1 py-3 px-6 rounded-lg font-montserratBold transition-colors ${
-                        selectedProduct.stock_quantity <= 0
-                          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                          : addingToCart === selectedProduct.id
-                            ? "bg-blue-400 text-white cursor-wait"
-                            : "bg-blue-500 text-white hover:bg-blue-600"
-                      }`}
-                    >
-                      {addingToCart === selectedProduct.id ? "Adding..." : "Add to Cart"}
-                    </button>
-                    <button className="flex-1 bg-gray-800 text-white py-3 px-6 rounded-lg font-montserratBold hover:bg-gray-700 transition-colors">
-                      Buy Now
-                    </button>
+                    {(() => {
+                      const contactPhone = selectedProduct?.whatsapp_number || selectedProduct?.client_admin?.phone;
+                      
+                      return contactPhone ? (
+                        <div className="w-full pt-4 border-t">
+                          <WhatsAppContact 
+                            phone={contactPhone}
+                            productName={selectedProduct.name}
+                          />
+                          <p className="text-xs text-gray-500 text-center mt-2">
+                            Contact the seller directly via WhatsApp
+                          </p>
+                        </div>
+                      ) : null;
+                    })()}
+
+                    <div className="border-t pt-6 mt-6 flex justify-between w-full flex-col ">
+                      <div className="flex justify-between gap-8 w-full pb-6">
+                        <button
+                          onClick={handleAddToCartFromDialog}
+                          disabled={selectedProduct.stock_quantity <= 0 || addingToCart === selectedProduct.id}
+                          className={`flex-1 py-3 px-6 rounded-lg font-montserratBold transition-colors ${
+                            selectedProduct.stock_quantity <= 0
+                              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                              : addingToCart === selectedProduct.id
+                                ? "bg-blue-400 text-white cursor-wait"
+                                : "bg-blue-500 text-white hover:bg-blue-600"
+                          }`}
+                        >
+                          {addingToCart === selectedProduct.id ? "Adding..." : "Add to Cart"}
+                        </button>
+                        <button className="flex-1 bg-gray-800 text-white py-3 px-6 rounded-lg font-montserratBold hover:bg-gray-700 transition-colors">
+                          Buy Now
+                        </button>
+                      </div>
+
+                      {/* Become an Agent Section */}
+                      <button
+                        onClick={() => {
+                          setIsAgentDialogOpen(true);
+                        }}
+                        className="w-full py-3 px-6 bg-purple-500 text-white rounded-lg font-semibold hover:bg-purple-600 transition-colors flex items-center justify-center gap-2"
+                      >
+                        <User size={20} />
+                        Become an Agent for This Product
+                      </button>
+
+                      {/* View Applications Button */}
+                      <button
+                        onClick={() => {
+                          setIsMyApplicationsDialogOpen(true);
+                        }}
+                        className="w-full mt-3 py-3 px-6 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
+                      >
+                        <Briefcase size={20} />
+                        View My Agent Applications
+                      </button>
+                      
+                      <p className="text-xs text-gray-500 text-center mt-2">
+                        Earn commission by promoting this product
+                      </p>
+                    </div>
                   </div>
 
                   <div className="space-y-4 border-t pt-4">
@@ -1076,6 +1156,40 @@ const Shop: React.FC = () => {
           }
         `}
       </style>
+      {/* Agent Application Dialog */}
+      <AgentApplicationDialog
+        isOpen={isAgentDialogOpen}
+        onClose={() => setIsAgentDialogOpen(false)}
+        productId={selectedProduct?.id || 0}
+        productName={selectedProduct?.name || ''}
+        onSuccess={() => {
+          showToast('Agent application submitted successfully!', 'success');
+        }}
+      />
+
+      {/* My Applications Dialog */}
+      {isMyApplicationsDialogOpen && (
+        <div
+          className="fixed inset-0 backdrop-blur-md bg-black/30 flex items-center justify-center z-[70] p-4"
+          onClick={() => setIsMyApplicationsDialogOpen(false)}
+        >
+          <div
+            className="bg-white rounded-lg w-full max-w-6xl max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="sticky top-0 bg-white border-b p-4 flex items-center justify-between">
+              <h2 className="text-xl font-bold">My Agent Applications</h2>
+              <button
+                onClick={() => setIsMyApplicationsDialogOpen(false)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <MyAgentApplications />
+          </div>
+        </div>
+      )} 
     </div>
   );
 };

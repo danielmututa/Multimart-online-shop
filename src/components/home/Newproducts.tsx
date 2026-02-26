@@ -619,8 +619,14 @@ const openDialog = async (product: Product) => {
                     </div>
                   </div>
 
-                    <div className="flex flex-col sm:flex-row gap-3 pt-6">
-                      {(() => {
+                    <div className="flex  sm:flex-row gap-3 pt-6">
+                    
+
+                    <div className=" pt-6 mt-6 flex justify-between w-full flex-col ">
+
+
+
+         {(() => {
                         // Use whatsapp_number from product first, fallback to client_admin.phone
                         const contactPhone = selectedProduct?.whatsapp_number || selectedProduct?.client_admin?.phone;
                         
@@ -637,7 +643,6 @@ const openDialog = async (product: Product) => {
                         ) : null;
                       })()}
 
-                    <div className="border-t pt-6 mt-6 flex justify-between w-full flex-col ">
                       <div className="flex justify-between gap-8 w-full pb-6">
                         <button
                           onClick={handleAddToCartFromDialog}
