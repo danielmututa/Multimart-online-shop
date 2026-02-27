@@ -73,7 +73,7 @@ const Navbar = () => {
               <div className="w-full flex flex-col">
                 <Link to="/shop" className="px-4 py-4 hover:bg-buttons dark:hover:text-white font-montserrat cursor-pointer dark:text-gray-300" onClick={handleMenuItemClick}>Product Listings</Link>
                 <Link to="/categories" className="px-4 py-4 hover:bg-buttons dark:hover:text-white font-montserrat cursor-pointer dark:text-gray-300" onClick={handleMenuItemClick}>Categories</Link>
-                <Link to="/account" className="px-4 py-4 hover:bg-buttons dark:hover:text-white font-montserrat cursor-pointer dark:text-gray-300" onClick={handleMenuItemClick}>Account</Link>
+                {/* <Link to="/account" className="px-4 py-4 hover:bg-buttons dark:hover:text-white font-montserrat cursor-pointer dark:text-gray-300" onClick={handleMenuItemClick}>Account</Link> */}
               </div>
             </div>
           </div>
@@ -89,7 +89,7 @@ const Navbar = () => {
             <div className={`absolute left-0 mt-[18px] w-48 bg-white dark:bg-slate-900 border dark:border-slate-800 rounded shadow-lg z-10 transition-all duration-300 origin-top ${openMenu === 'blogs' ? 'opacity-100 transform scale-y-100' : 'opacity-0 transform scale-y-0'}`}>
               <div className="w-full flex flex-col">
                 <Link to="/blog" className="px-4 py-4 hover:bg-buttons dark:hover:text-white font-montserrat cursor-pointer dark:text-gray-300" onClick={handleMenuItemClick}>Blog</Link>
-                <Link to="/blogarticle" className="px-4 py-4 hover:bg-buttons dark:hover:text-white font-montserrat cursor-pointer dark:text-gray-300" onClick={handleMenuItemClick}>Blog Article</Link>
+                {/* <Link to="/blogarticle" className="px-4 py-4 hover:bg-buttons dark:hover:text-white font-montserrat cursor-pointer dark:text-gray-300" onClick={handleMenuItemClick}>Blog Article</Link> */}
               </div>
             </div>
           </div>

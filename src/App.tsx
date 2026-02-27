@@ -18,10 +18,10 @@ import FQA from "./components/pages/FQA";
 import Whilelist from "./components/pages/Whilelist";
 import Shop from "./components/shop/Shop";
 import Categories from "./components/shop/Categories";
-import Account from "./components/shop/Account";
+// import Account from "./components/shop/Account";
 import Blog from "./components/blogs/Blog";
 import BlogList from "./components/blogs/BlogList";
-import Blogarticle from "./components/blogs/Blogarticle";
+// import Blogarticle from "./components/blogs/Blogarticle";
 import CartItems from "./components/shop/Cartitems";
 import PaymentForm from "./components/payments/PaymentForm";
 import OAuthCallback from '@/Auth/OAuthCallback';
@@ -83,10 +83,10 @@ function App() {
             <Route element={<RoleProtectedRoute requiredRole="user" redirectTo="/register" />}>
               <Route path="/blog" element={<><Navbar /><MediaNavbar /><BlogList /><Footer /></>} />
               <Route path="/blog/:id" element={<><Navbar /><MediaNavbar /><Blog /><Footer /></>} />
-              <Route path="/blogarticle" element={<><Navbar /><MediaNavbar /><Blogarticle /><Footer /></>} />
+              {/* <Route path="/blogarticle" element={<><Navbar /><MediaNavbar /><Blogarticle /><Footer /></>} /> */}
               <Route path="/shop" element={<><Navbar /><MediaNavbar /><Shop /><Footer /></>} />
               <Route path="/categories" element={<><Navbar /><MediaNavbar /><Categories /><Footer /></>} />
-              <Route path="/account" element={<><Navbar /><MediaNavbar /><Account /><Footer /></>} />
+              {/* <Route path="/account" element={<><Navbar /><MediaNavbar /><Account /><Footer /></>} /> */}
               <Route path="/cart" element={<><Navbar /><MediaNavbar /><CartItems /><Footer /></>} />
               <Route path="/bill" element={<><Navbar /><MediaNavbar /><PaymentForm /><Footer /></>} />
             </Route>

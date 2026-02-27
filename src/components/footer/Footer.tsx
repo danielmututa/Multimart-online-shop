@@ -60,9 +60,7 @@ const Footer = () => {
   const services = () => {
     navigate("/services")
   }
-  const account = () => {
-    navigate("/account")
-  }
+ 
 
 
   return (
@@ -106,7 +104,7 @@ const Footer = () => {
                 <p className='font-montserrat cursor-pointer text-white text-sm md:text-[16px]' onClick={contact}>Contact Us</p>
                 <p className='font-montserrat cursor-pointer text-white text-sm md:text-[16px]' onClick={faq}>FAQS</p>
                 <p className='font-montserrat cursor-pointer text-white text-sm md:text-[16px]' onClick={blogarticle}>Blogarticle </p>
-                <p className='font-montserrat cursor-pointer text-white text-sm md:text-[16px]' onClick={account}>Account</p>
+          
            
      
     </div>

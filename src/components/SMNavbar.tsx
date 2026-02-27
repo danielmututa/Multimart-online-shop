@@ -88,7 +88,7 @@ const MobileNavbar: React.FC = () => {
                 <div className="pl-4 pt-2 space-y-3">
                   <Link to="/shop" className="block text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Product Listings</Link>
                   <Link to="/categories" className="block text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Categories</Link>
-                  <Link to="/account" className="block text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Account</Link>
+                  {/* <Link to="/account" className="block text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Account</Link> */}
                 </div>
               </div>
             </div>
@@ -105,7 +105,7 @@ const MobileNavbar: React.FC = () => {
               <div className={`overflow-hidden transition-all duration-300 ${openAccordion === 'blogs' ? 'max-h-96' : 'max-h-0'}`}>
                 <div className="pl-4 pt-2 space-y-3">
                   <Link to="/blog" className="block text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Blog</Link>
-                  <Link to="/blogarticle" className="block text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Blog Article</Link>
+                  {/* <Link to="/blogarticle" className="block text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Blog Article</Link> */}
                 </div>
               </div>
             </div>
