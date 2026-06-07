@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import { useForm } from "react-hook-form"
 import { useAuthStore } from "@/context/userContext"
 import { useEffect, useState } from "react"
@@ -18,6 +18,8 @@ interface LoginInput {
 
 const Login = () => {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const isAdminView = searchParams.get('admin') === 'true'
   const { login } = useAuthStore()
   const [activeTab, setActiveTab] = useState<'customer' | 'merchant'>('customer')
 
@@ -160,10 +162,10 @@ const Login = () => {
                           <SelectValue placeholder="Select your role" />
                         </SelectTrigger>
                         <SelectContent>
-                        <SelectItem value="super_admin">Super Admin</SelectItem>
-                        <SelectItem value="client_admin">Client Admin (Merchant)</SelectItem>
-                        <SelectItem value="agent">Agent</SelectItem>
-                        <SelectItem value="digital_marketer_admin">Digital Marketer</SelectItem>
+                          {isAdminView && <SelectItem value="super_admin">Super Admin</SelectItem>}
+                          <SelectItem value="client_admin">Client Admin (Merchant)</SelectItem>
+                          {isAdminView && <SelectItem value="agent">Agent</SelectItem>}
+                          {isAdminView && <SelectItem value="digital_marketer_admin">Digital Marketer</SelectItem>}
                         </SelectContent>
                       </Select>
                       {errors.role && <span className="text-red-500 text-xs">{errors.role.message}</span>}

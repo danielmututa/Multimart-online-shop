@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, X, Plus, Minus, Star, Check, ShoppingCart, Heart, User, Briefcase } from 'lucide-react';
+import { ChevronRight, X, Plus, Minus, Star, Check, ShoppingCart, Heart, User, Briefcase, MapPin } from 'lucide-react';
 import { apiClient } from '@/context/axios';
 import { useCart } from './CartContext';
 import { useAuthStore } from '@/context/userContext';
@@ -14,7 +14,7 @@ interface Product {
   price: string;
   stock_quantity: number;
   image_url: string;
-  categories: { id: number; name: string }; // Fixed: This should be an object, not array
+  categories: { id: number; name: string };
   category_id: number;
   discount_percentage?: number;
   rating?: number;
@@ -23,6 +23,9 @@ interface Product {
   views?: number;
   reviews?: Review[];
   client_admin_id?: number;
+  merchant_latitude?: number | null;
+  merchant_longitude?: number | null;
+  merchant_address?: string | null;
   client_admin?: {
     id: number;
     username?: string;
@@ -33,6 +36,18 @@ interface Product {
     role: string;
   };
 }
+
+// Haversine formula to calculate distance in km
+const haversineDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+};
 
 interface Review {
   id: number;
@@ -68,6 +83,9 @@ const Shop: React.FC = () => {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
 
+  // Client location for distance calculation
+  const [clientLocation, setClientLocation] = useState<{ lat: number; lng: number } | null>(null);
+
   // Filter states
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
@@ -97,6 +115,23 @@ const Shop: React.FC = () => {
   const [productSearch, setProductSearch] = useState('');
   const [categorySearch, setCategorySearch] = useState('');
   const [brandSearch, setBrandSearch] = useState('');
+
+  // Get client's GPS location on mount (silent – no error toast, it's optional)
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => setClientLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => {} // silently fail – distance badge just won't show
+      );
+    }
+  }, []);
+
+  // Helper: get distance from client to a product's merchant
+  const getProductDistance = (product: Product): string | null => {
+    if (!clientLocation || !product.merchant_latitude || !product.merchant_longitude) return null;
+    const km = haversineDistance(clientLocation.lat, clientLocation.lng, product.merchant_latitude, product.merchant_longitude);
+    return km < 1 ? `${Math.round(km * 1000)} m away` : `${km.toFixed(1)} km away`;
+  };
 
   const ITEMS_PER_PAGE = 9;
 
@@ -697,6 +732,17 @@ const Shop: React.FC = () => {
                       Only {card.stock_quantity} left!
                     </div>
                   )}
+
+                  {/* Distance badge */}
+                  {(() => {
+                    const dist = getProductDistance(card);
+                    return dist ? (
+                      <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                        <MapPin size={10} />
+                        {dist}
+                      </div>
+                    ) : null;
+                  })()}
 
                   {/* Sidebar actions match Newproducts style */}
                   <div className="absolute top-0 right-4 h-full flex items-center gap-2 flex-col justify-center opacity-100 translate-y-0 sm:opacity-0 sm:translate-y-5 sm:group-hover:opacity-100 sm:group-hover:translate-y-0 transition-all duration-300">

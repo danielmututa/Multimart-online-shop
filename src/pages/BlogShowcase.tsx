@@ -23,8 +23,10 @@ import { toast } from 'sonner';
 import { BlogPostSM } from '@/lib/schemas/blogs/blog';
 import { apiClient } from '@/context/axios';
 import { GetBlogs, UpdateBlog } from '@/api';
+import { useAuthStore } from '@/context/userContext';
 
 const BlogShowcase: React.FC = () => {
+  const { user } = useAuthStore();
   const [blogs, setBlogs] = useState<BlogPostSM[]>([]);
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; blogId: number | null }>({
     open: false,
@@ -59,18 +61,26 @@ const BlogShowcase: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await GetBlogs();
+        
+        // Pass user.id if logged in to filter by merchant
+        const response = await GetBlogs(undefined, undefined, user?.id);
         setBlogs(response.data); // Extract the data array
-      } catch (err: unknown) {
-        const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
-        setError(`Failed to load blogs: ${errorMessage}`);
-        toast.error(`Failed to load blogs: ${errorMessage}`);
+      } catch (err: any) {
+        // Handle 404 specifically as "no blogs yet"
+        if (err.message && (err.message.includes('404') || err.message.includes('not found'))) {
+          setBlogs([]);
+          setError(null);
+        } else {
+          const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+          setError(`Failed to load blogs: ${errorMessage}`);
+          toast.error(`Failed to load blogs: ${errorMessage}`);
+        }
       } finally {
         setLoading(false);
       }
     };
     fetchBlogs();
-  }, []);
+  }, [user?.id]);
 
   // Handle file input change with validation
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -167,7 +177,9 @@ const BlogShowcase: React.FC = () => {
       {loading ? (
         <p>Loading blogs...</p>
       ) : blogs.length === 0 ? (
-        <p>No blogs available.</p>
+        <div className="text-center py-10">
+          <p className="text-gray-500 mb-4">No blog post created yet. Click 'Create Blog' to get started!</p>
+        </div>
       ) : (
         <Table>
           <TableHeader>

@@ -36,7 +36,7 @@ const HomePage = lazy(() => import('./pages/Home'));
 const FeedbackPage = lazy(() => import('./pages/Feedback'));
 const OrdersPage = lazy(() => import('./pages/Orders'));
 const ProductsPage = lazy(() => import('./pages/Products'));
-const AgentProductsPage = lazy(() => import('./pages/AdminAgentManagement'));
+// const AgentProductsPage = lazy(() => import('./pages/AdminAgentManagement'));
 const UsersPage = lazy(() => import('./pages/Users'));
 const BlogPage = lazy(() => import('./pages/Blogs'));
 const LoginPage = lazy(() => import('./Auth/Login'));
@@ -135,7 +135,7 @@ function App() {
               />
 
               <Route path="/blogandproductsapproval" element={<BlogAndProductsApprovalPage />} />
-              <Route path="/agentproducts" element={<AgentProductsPage />} />
+              {/* <Route path="/agentproducts" element={<AgentProductsPage />} /> */}
               <Route path="/prodt" element={<ProductShowcases />} />
               <Route path="/blogshowcase" element={<BlogShowcases />} />
               <Route path="/users" element={<UsersPage />} />
@@ -173,7 +173,7 @@ function App() {
               {/* Other admin routes */}
               <Route path="/feedback" element={<FeedbackPage />} />
               <Route path="/orders" element={<OrdersPage />} />
-              <Route path="/agentproducts" element={<AgentProductsPage />} />
+              {/* <Route path="/agentproducts" element={<AgentProductsPage />} /> */}
               <Route path="/prodt" element={<ProductShowcases />} />
               <Route path="/blogshowcase" element={<BlogShowcases />} />
               <Route path="/users" element={<UsersPage />} />
@@ -181,11 +181,11 @@ function App() {
 
 
             {/* ============================================ */}
-            {/* AGENT ROUTES - for sales agents */}
-            {/* ============================================ */}
+            {/* AGENT ROUTES - for sales agents (DISABLED)
             <Route element={<RoleProtectedRoute requiredRole="agent" redirectTo="/" />}>
               <Route path="/agent-dashboard" element={<div>Agent Dashboard</div>} />
             </Route>
+            */}
 
             {/* Fallback route - redirect based on role */}
             <Route path="*" element={<RoleBasedRedirect />} />

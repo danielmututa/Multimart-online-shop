@@ -1125,6 +1125,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 
+import { useAuthStore } from '@/context/userContext';
+
 // Define Product interface
 interface Product {
   id: number;
@@ -1161,10 +1163,19 @@ function useFetch<T>(
           method: options.method || 'GET',
           headers: options.headers || { 'Content-Type': 'application/json' },
         });
-        setData(response.data);
-      } catch (err: unknown) {
-        const error = err instanceof Error ? err : new Error('Unknown error');
-        setError(error);
+        
+        // Handle both direct data and { success: true, data: [...] } formats
+        const resultData = response.data.data !== undefined ? response.data.data : response.data;
+        setData(resultData);
+      } catch (err: any) {
+        // If it's a 404 error, we treat it as empty data (no products yet)
+        if (err.response && err.response.status === 404) {
+          setData([] as unknown as T);
+          setError(null);
+        } else {
+          const error = err instanceof Error ? err : new Error('Unknown error');
+          setError(error);
+        }
       } finally {
         setLoading(false);
       }
@@ -1176,6 +1187,7 @@ function useFetch<T>(
 }
 
 const ProductShowcase: React.FC = () => {
+  const { user } = useAuthStore();
   const [products, setProducts] = useState<Product[]>([]);
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; productId: number | null }>({
     open: false,
@@ -1198,8 +1210,13 @@ const ProductShowcase: React.FC = () => {
     return imageUrl;
   };
 
-  // Fetch all products using useFetch
-  const { data, loading, error } = useFetch<Product[]>('/api/products', {
+  // Determine endpoint based on role
+  const fetchUrl = user?.role === 'client_admin' 
+    ? `/api/products/merchant/${user.id}` 
+    : '/api/products';
+
+  // Fetch products using useFetch
+  const { data, loading, error } = useFetch<Product[]>(fetchUrl, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
   });
@@ -1371,7 +1388,9 @@ const ProductShowcase: React.FC = () => {
       {loading ? (
         <p>Loading products...</p>
       ) : products.length === 0 ? (
-        <p>No products available.</p>
+        <p className="text-gray-500 italic py-10 text-center border rounded-lg bg-gray-50">
+          No product created yet. Click "Create Product" to get started!
+        </p>
       ) : (
         <Table>
           <TableHeader>

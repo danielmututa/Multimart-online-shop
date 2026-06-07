@@ -106,12 +106,20 @@ const Blogs: React.FC<BlogsProps> = ({ onBlogAction }) => {
             categories: blog.categories || '',
             blog_images: blog.blog_images || [],
           });
-        } catch (error) {
-          setSubmitStatus({
-            loading: false,
-            error: 'Failed to load blog. Please try again.',
-            success: false,
-          });
+        } catch (error: any) {
+          if (error.message && (error.message.includes('404') || error.message.includes('not found'))) {
+            setSubmitStatus({
+              loading: false,
+              error: 'Blog not found.',
+              success: false,
+            });
+          } else {
+            setSubmitStatus({
+              loading: false,
+              error: 'Failed to load blog. Please try again.',
+              success: false,
+            });
+          }
         }
       };
       fetchBlog();

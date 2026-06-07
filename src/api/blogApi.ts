@@ -21,11 +21,12 @@ export const CreateBlog = async (data: FormData): Promise<BlogPostSM> => {
   }
 };
 
-export const GetBlogs = async (page?: number, limit?: number): Promise<BlogResponseSM> => {
+export const GetBlogs = async (page?: number, limit?: number, authorId?: number): Promise<BlogResponseSM> => {
   try {
     const params = new URLSearchParams();
     if (page) params.append('page', page.toString());
     if (limit) params.append('limit', limit.toString());
+    if (authorId) params.append('authorId', authorId.toString());
     
     const response = await apiClient.get(`/api/blogs?${params.toString()}`);
     return response.data;

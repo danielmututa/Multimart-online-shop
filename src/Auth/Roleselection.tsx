@@ -5,10 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useNavigate } from "react-router-dom";
 
 const RoleSelection = () => {
-  const [selectedRole, setSelectedRole] = useState<"client" | "client_admin" | "agent" | null>(null);
+  const [selectedRole, setSelectedRole] = useState<"client" | "client_admin" | null>(null);
   const navigate = useNavigate();
 
-  const handleRoleSelect = (role: "client" | "client_admin" | "agent") => {
+  const handleRoleSelect = (role: "client" | "client_admin") => {
     setSelectedRole(role);
   };
 
@@ -17,8 +17,6 @@ const RoleSelection = () => {
       navigate("/register/client");
     } else if (selectedRole === "client_admin") {
       navigate("/register/admin");
-    } else if (selectedRole === "agent") {
-      navigate("/register/agent");
     }
   };
 
@@ -30,7 +28,7 @@ const RoleSelection = () => {
           <CardDescription>Choose how you want to use our platform</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card 
               className={`cursor-pointer p-4 text-center border-2 transition-all ${
                 selectedRole === "client" 
@@ -56,20 +54,6 @@ const RoleSelection = () => {
               <h3 className="font-semibold mb-2">🏢 Merchant</h3>
               <p className="text-sm text-muted-foreground">
                 Manage your business products and sales
-              </p>
-            </Card>
-
-            <Card 
-              className={`cursor-pointer p-4 text-center border-2 transition-all ${
-                selectedRole === "agent" 
-                  ? "border-accent bg-accent/10" 
-                  : "border-border hover:border-accent/50"
-              }`}
-              onClick={() => handleRoleSelect("agent")}
-            >
-              <h3 className="font-semibold mb-2">🕵️ Agent</h3>
-              <p className="text-sm text-muted-foreground">
-                Promote products and earn commissions
               </p>
             </Card>
           </div>

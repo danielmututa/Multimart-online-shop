@@ -94,11 +94,17 @@ const Products: React.FC<ProductTableProps> = ({ onProductAction }) => {
       } else {
         toast.warning("⚠️ No categories found. Create your first product to add categories.")
       }
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error("❌ Error fetching categories:", error)
 
       if (loadingToastId !== undefined) {
         toast.dismiss(loadingToastId)
+      }
+
+      // If it's a 404 error, we treat it as "no categories yet" (no products exist)
+      if (error.response && error.response.status === 404) {
+        setCategories([])
+        return
       }
 
       const errorMessage = error instanceof Error ? error.message : "Failed to load categories"

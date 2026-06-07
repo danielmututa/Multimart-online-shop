@@ -27,7 +27,7 @@ interface RegisterFormData {
 }
 
 interface RegisterProps {
-  role?: 'client' | 'client_admin' | 'agent';
+  role?: 'client' | 'client_admin';
 }
 
 const Register = ({ role }: RegisterProps = {}) => {
@@ -37,8 +37,8 @@ const Register = ({ role }: RegisterProps = {}) => {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   // Default to client, no more 'client' option
-  const [registerType, setRegisterType] = useState<'client' | 'client_admin' | 'agent'>(
-    role === 'agent' ? 'agent' : role === 'client_admin' ? 'client_admin' : 'client'
+  const [registerType, setRegisterType] = useState<'client' | 'client_admin'>(
+    role === 'client_admin' ? 'client_admin' : 'client'
   )
   const [gettingLocation, setGettingLocation] = useState(false)
 
@@ -112,6 +112,32 @@ const Register = ({ role }: RegisterProps = {}) => {
     )
   }
 
+  const handleVerifyAddress = async () => {
+    const address = watch("physicalAddress");
+    if (!address) {
+      toast.error("Please enter a physical address first");
+      return;
+    }
+
+    setGettingLocation(true);
+    try {
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
+      const data = await response.json();
+      if (data && data.length > 0) {
+        setValue('latitude', parseFloat(data[0].lat));
+        setValue('longitude', parseFloat(data[0].lon));
+        toast.success("✅ Coordinates fetched from address!");
+      } else {
+        toast.error("❌ Could not find coordinates for this address.");
+      }
+    } catch (error) {
+      console.error("Geocoding error:", error);
+      toast.error("❌ Error fetching coordinates.");
+    } finally {
+      setGettingLocation(false);
+    }
+  }
+
   const onSubmit = async (data: RegisterFormData) => {
     console.log("Registering with role:", registerType)
     let loadingToastId: string | number | undefined
@@ -149,30 +175,6 @@ const Register = ({ role }: RegisterProps = {}) => {
         }
       }
 
-      // Add agent-specific fields for agent
-      if (registerType === 'agent') {
-        if (!data.commissionRate || data.commissionRate <= 0) {
-          toast.dismiss(loadingToastId)
-          toast.error("Commission rate is required for agents")
-          return
-        }
-        if (!data.payoutMethod) {
-          toast.dismiss(loadingToastId)
-          toast.error("Payout method is required for agents")
-          return
-        }
-        if (!data.payoutNumber) {
-          toast.dismiss(loadingToastId)
-          toast.error("Payout number is required for agents")
-          return
-        }
-
-        registerData.commissionRate = data.commissionRate
-        registerData.payoutMethod = data.payoutMethod
-        registerData.payoutNumber = data.payoutNumber
-        registerData.payoutName = data.payoutName || data.username
-        registerData.minPayoutAmount = data.minPayoutAmount || 10
-      }
 
       await authRegister(registerData)
 
@@ -190,8 +192,6 @@ const Register = ({ role }: RegisterProps = {}) => {
       setTimeout(() => {
         if (registerType === 'client_admin') {
           navigate("/admin-dashboard")
-        } else if (registerType === 'agent') {
-          navigate("/agent-dashboard")
         } else {
           navigate("/")
         }
@@ -228,7 +228,7 @@ const Register = ({ role }: RegisterProps = {}) => {
                 <label className="text-sm font-medium">Register As</label>
                 <Select 
                   value={registerType} 
-                  onValueChange={(value: 'client' | 'client_admin' | 'agent') => setRegisterType(value)}
+                  onValueChange={(value: 'client' | 'client_admin') => setRegisterType(value)}
                   disabled={!!role} // Disable if role is provided via prop
                 >
                   <SelectTrigger>
@@ -237,7 +237,6 @@ const Register = ({ role }: RegisterProps = {}) => {
                   <SelectContent>
                     <SelectItem value="client">Client (Customer)</SelectItem>
                     <SelectItem value="client_admin">Client Admin (Merchant)</SelectItem>
-                    <SelectItem value="agent">Agent (Sales Representative)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -245,13 +244,11 @@ const Register = ({ role }: RegisterProps = {}) => {
               {/* Username/Business Name/Agent Name Field */}
               <div className="flex items-start flex-col gap-1">
                 <label className="text-sm font-medium">
-                  {registerType === 'client_admin' ? 'Business Name' : 
-                   registerType === 'agent' ? 'Agent Name' : 'Full Name'}
+                  {registerType === 'client_admin' ? 'Business Name' : 'Full Name'}
                 </label>
                 <Input
                   {...register("username", {
-                    required: registerType === 'client_admin' ? "Business name is required" : 
-                              registerType === 'agent' ? "Agent name is required" : "Name is required",
+                    required: registerType === 'client_admin' ? "Business name is required" : "Name is required",
                     minLength: {
                       value: 2,
                       message: "Must be at least 2 characters",
@@ -262,8 +259,7 @@ const Register = ({ role }: RegisterProps = {}) => {
                     },
                   })}
                   className="italic"
-                  placeholder={registerType === 'client_admin' ? "Dan's Dental Clinic" : 
-                               registerType === 'agent' ? "John Sales Agent" : "Peter Parker"}
+                  placeholder={registerType === 'client_admin' ? "Dan's Dental Clinic" : "Peter Parker"}
                 />
                 {errors.username && <span className="text-red-500 text-xs">{errors.username.message}</span>}
               </div>
@@ -336,16 +332,27 @@ const Register = ({ role }: RegisterProps = {}) => {
                   {/* Geographic Location */}
                   <div className="flex flex-col gap-2">
                     <label className="text-sm font-medium">Geographic Location</label>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleGetLocation}
-                      disabled={gettingLocation}
-                      className="w-full"
-                    >
-                      <MapPin className="mr-2 h-4 w-4" />
-                      {gettingLocation ? "Getting location..." : "Get Current Location"}
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleGetLocation}
+                        disabled={gettingLocation}
+                        className="w-full text-xs"
+                      >
+                        <MapPin className="mr-2 h-4 w-4" />
+                        {gettingLocation ? "Wait..." : "GPS Location"}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleVerifyAddress}
+                        disabled={gettingLocation}
+                        className="w-full text-xs"
+                      >
+                        {gettingLocation ? "Wait..." : "Verify Address"}
+                      </Button>
+                    </div>
                     
                     <div className="grid grid-cols-2 gap-2">
                       {/* Latitude */}
@@ -366,7 +373,8 @@ const Register = ({ role }: RegisterProps = {}) => {
                           type="number"
                           step="any"
                           placeholder="-17.8252"
-                          className="text-sm"
+                          className="text-sm bg-gray-100"
+                          readOnly
                         />
                         {errors.latitude && <span className="text-red-500 text-xs">{errors.latitude.message}</span>}
                       </div>
@@ -389,13 +397,14 @@ const Register = ({ role }: RegisterProps = {}) => {
                           type="number"
                           step="any"
                           placeholder="31.0335"
-                          className="text-sm"
+                          className="text-sm bg-gray-100"
+                          readOnly
                         />
                         {errors.longitude && <span className="text-red-500 text-xs">{errors.longitude.message}</span>}
                       </div>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Click "Get Current Location" or enter coordinates manually
+                      Click "Verify Address" or use "GPS Location"
                     </p>
                   </div>
                 </>
@@ -404,9 +413,10 @@ const Register = ({ role }: RegisterProps = {}) => {
               {/* ========================================== */}
               {/* AGENT ONLY FIELDS - Commission & Payout Info */}
               {/* ========================================== */}
+              {/*
               {registerType === 'agent' && (
                 <>
-                  {/* Commission Rate */}
+                 
                   <div className="flex items-start flex-col gap-1">
                     <label className="text-sm font-medium">Commission Rate (%)</label>
                     <Input
@@ -433,7 +443,7 @@ const Register = ({ role }: RegisterProps = {}) => {
                     </p>
                   </div>
 
-                  {/* Payout Method */}
+                 
                   <div className="flex flex-col gap-2">
                     <label className="text-sm font-medium">Payout Method</label>
                     <Select 
@@ -454,7 +464,7 @@ const Register = ({ role }: RegisterProps = {}) => {
                     {errors.payoutMethod && <span className="text-red-500 text-xs">{errors.payoutMethod.message}</span>}
                   </div>
 
-                  {/* Payout Number */}
+                  
                   <div className="flex items-start flex-col gap-1">
                     <label className="text-sm font-medium">Payout Number/Account</label>
                     <Input
@@ -474,7 +484,7 @@ const Register = ({ role }: RegisterProps = {}) => {
                     </p>
                   </div>
 
-                  {/* Payout Name */}
+              
                   <div className="flex items-start flex-col gap-1">
                     <label className="text-sm font-medium">Payout Account Name (Optional)</label>
                     <Input
@@ -487,7 +497,7 @@ const Register = ({ role }: RegisterProps = {}) => {
                     </p>
                   </div>
 
-                  {/* Minimum Payout Amount */}
+                
                   <div className="flex items-start flex-col gap-1">
                     <label className="text-sm font-medium">Minimum Payout Amount (USD)</label>
                     <Input
@@ -510,7 +520,7 @@ const Register = ({ role }: RegisterProps = {}) => {
                     </p>
                   </div>
                 </>
-              )}
+              )}*/}
 
               {/* Password Field */}
               <div className="flex items-start flex-col gap-1">
@@ -574,7 +584,7 @@ const Register = ({ role }: RegisterProps = {}) => {
             <CardFooter className="flex flex-col gap-4">
               <Button type="submit" disabled={isSubmitting} className="w-full">
                 {isSubmitting ? "Registering..." : `Register as ${
-                  registerType === 'client_admin' ? 'Merchant' : 'Agent'
+                  registerType === 'client_admin' ? 'Merchant' : 'Client'
                 }`}
               </Button>
               <div className="w-full flex justify-between items-center">

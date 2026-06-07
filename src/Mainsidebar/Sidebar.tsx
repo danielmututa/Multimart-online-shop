@@ -67,7 +67,7 @@ const getSidebarItems = (userRole: string) => {
     { title: "Home", path: "/", icon: Home },
     { title: "Products", path: "/products", icon: AiOutlineProduct },
     { title: "B & P Approval", path: "/blogandproductsapproval", icon: AiOutlineProduct },
-    { title: "AgentApproval", path: "/agentproducts", icon: AiOutlineProduct },
+    // { title: "AgentApproval", path: "/agentproducts", icon: AiOutlineProduct },
     { title: "Feedback", path: "/feedback", icon: VscFeedback },
     { title: "Blogs", path: "/blogs", icon: FiFileText },
     { title: "Orders", path: "/orders", icon: CiBoxes },
